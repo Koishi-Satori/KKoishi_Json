@@ -1,0 +1,261 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "32\n"
+     ]
+    }
+   ],
+   "source": [
+    "def f(x):\n",
+    "    y = 6*x**2+3*x+2\n",
+    "    print(y)\n",
+    "\n",
+    "f(2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[1, 2, 3, 4, 5]\n"
+     ]
+    }
+   ],
+   "source": [
+    "l0 = [1,2,3,3,3,3,4,5]\n",
+    "l1 = []\n",
+    "def f(l1, l2):\n",
+    "    l2 = list(set(l1))\n",
+    "    print(l2)\n",
+    "f(sl,ul)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "No. of Upper case characters :  3 \n",
+      "No. of Lower case Characters :  3\n"
+     ]
+    }
+   ],
+   "source": [
+    "\n",
+    "string = 'abc ABC'\n",
+    "def f(string):\n",
+    "    uc = 0\n",
+    "    lc = 0\n",
+    "    for i in string:\n",
+    "        if 97<=ord(i)<=122:\n",
+    "            lc = lc+1\n",
+    "        elif 65<=ord(i)<=90:\n",
+    "            uc = uc+1\n",
+    "        else:\n",
+    "            pass\n",
+    "    print('No. of Upper case characters : ',uc,'\\nNo. of Lower case Characters : ',lc)\n",
+    "\n",
+    "f(string)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "True\n",
+      "False\n"
+     ]
+    }
+   ],
+   "source": [
+    "string1 = 'Levelheaded Llama'\n",
+    "string2 = 'Crazy Kangaroo'\n",
+    "\n",
+    "def f(str):\n",
+    "    a = str[0]\n",
+    "    str = str.split()\n",
+    "    for i in string:\n",
+    "        if i[0] == a:\n",
+    "            pass\n",
+    "        else:\n",
+    "            return print('False')\n",
+    "    return print('True')\n",
+    "\n",
+    "f(string1)\n",
+    "f(string2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "yes\n"
+     ]
+    }
+   ],
+   "source": [
+    "n = 114514\n",
+    "a = 11451\n",
+    "b = 1145141919810\n",
+    "if n in range(a,b):\n",
+    "    print('yes')\n",
+    "else:\n",
+    "    print('no')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "home am I\n"
+     ]
+    }
+   ],
+   "source": [
+    "string = 'I am home'\n",
+    "string = string.split()[::-1]\n",
+    "print(' '.join(string))\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "120\n"
+     ]
+    }
+   ],
+   "source": [
+    "from math import factorial\n",
+    "\n",
+    "\n",
+    "num = 5\n",
+    "def sol(num):\n",
+    "    print(factorial(num))\n",
+    "\n",
+    "sol(num)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "yes\n"
+     ]
+    }
+   ],
+   "source": [
+    "num = 496\n",
+    "ls = []\n",
+    "for i in range(1,num):\n",
+    "    if num%i == 0:\n",
+    "        ls.append(i)\n",
+    "    else:\n",
+    "        pass\n",
+    "if sum(ls) == num:\n",
+    "    print('yes')\n",
+    "else:\n",
+    "    print('no')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 56,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "yes\n"
+     ]
+    }
+   ],
+   "source": [
+    "ls = []\n",
+    "ls2 = ['j', 't', ' ', 'i', 'x', 'f', 'e', 'o', 'b', 'n', 'l', 'k', 'y', 'a', 'c', 'p', 'h', 'g', 'v', 'w', 's', 'q', 'm', 'r', 'z', 'd', 'u']\n",
+    "string = 'The quick brown fox jumps over the lazy dog'\n",
+    "for i in string:\n",
+    "    ls.append(i.lower())\n",
+    "ls = set(ls)\n",
+    "def sol(ls):\n",
+    "    for j in ls2:\n",
+    "        if j in ls:\n",
+    "            pass\n",
+    "        else:\n",
+    "            return print('no')\n",
+    "    return print('yes')\n",
+    "sol(ls)\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3.9.12 ('base')",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.13"
+  },
+  "orig_nbformat": 4,
+  "vscode": {
+   "interpreter": {
+    "hash": "5179d32cf6ec497baf3f8a3ef987cc77c5d2dc691fdde20a56316522f61a7326"
+   }
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
