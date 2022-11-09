@@ -35,7 +35,7 @@ abstract class FieldTypeParser<T>(type: Type<T>) : TypeParser<T>(type) {
             if (field.getAnnotation(DeserializationIgnored::class.java) != null)
                 later.addLast(field)
             else
-                unsafe.getAndSetObject(instance, unsafe.objectFieldOffset(field), obj[name])
+                unsafe.compareAndSwapObject(instance, unsafe.objectFieldOffset(field), null, obj[name])
         }
         while (later.isNotEmpty()) {
             val f = later.removeFirst()
@@ -62,17 +62,28 @@ abstract class FieldTypeParser<T>(type: Type<T>) : TypeParser<T>(type) {
         for (fd in serializeAllFields()) {
             if (fd.field.getAnnotation(SerializationIgnored::class.java) != null)
                 later.addLast(fd)
-            else {
-                fd.field.isAccessible = true
-                println(fd)
-                obj[fd.name] = valueWrap(fd.field[t])
-            }
+            else
+                obj[fd.name] = valueWrap(unsafeGetField(fd.field, t))
         }
         while (later.isNotEmpty()) {
             val fd = later.removeFirst()
             obj[fd.name] = valueWrap(defaultValue(fd.field, t as Any))
         }
         return obj
+    }
+
+    private fun unsafeGetField(f: Field, inst: T): Any? {
+        return when (f.type) {
+            Integer.TYPE, Integer::class.java -> unsafe.getInt(inst, unsafe.objectFieldOffset(f))
+            java.lang.Long.TYPE, java.lang.Long::class.java -> unsafe.getLong(inst, unsafe.objectFieldOffset(f))
+            java.lang.Byte.TYPE, java.lang.Byte::class.java -> unsafe.getByte(inst, unsafe.objectFieldOffset(f))
+            java.lang.Short.TYPE, java.lang.Short::class.java -> unsafe.getShort(inst, unsafe.objectFieldOffset(f))
+            Character.TYPE, Character::class.java -> unsafe.getChar(inst, unsafe.objectFieldOffset(f))
+            java.lang.Float.TYPE, java.lang.Float::class.java -> unsafe.getFloat(inst, unsafe.objectFieldOffset(f))
+            java.lang.Double.TYPE, java.lang.Double::class.java -> unsafe.getDouble(inst, unsafe.objectFieldOffset(f))
+            java.lang.Boolean.TYPE, java.lang.Boolean::class.java -> unsafe.getBoolean(inst, unsafe.objectFieldOffset(f))
+            else -> unsafe.getObject(inst, unsafe.objectFieldOffset(f))
+        }
     }
 
     private fun isWrapClass(clz: Class<*>): Boolean {

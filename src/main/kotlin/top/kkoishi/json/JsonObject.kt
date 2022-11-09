@@ -42,13 +42,15 @@ class JsonObject : JsonElement, Iterable<Pair<String, JsonElement>> {
 
     operator fun get(k: String) = content[k]
 
-    fun put(v: Pair<String, JsonElement>): JsonElement? {
-        if (!content.contains(v.first))
-            keys.addLast(v.first)
-        return content.put(v.first, v.second)
+    fun put(v: Pair<String, JsonElement>): JsonElement? = put(v.first, v.second)
+
+    fun put(k: String, v: JsonElement): JsonElement? {
+        if (!content.contains(k))
+            keys.addLast(k)
+        return content.put(k, v)
     }
 
-    operator fun set(k: String, v: JsonElement) = content.put(k, v)
+    operator fun set(k: String, v: JsonElement) = put(k, v)
 
     override fun toString(): String {
         return "JsonObject(content=$content)"

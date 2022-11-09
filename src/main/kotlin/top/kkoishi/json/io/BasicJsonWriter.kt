@@ -26,11 +26,12 @@ class BasicJsonWriter @JvmOverloads constructor(
     @Suppress("SENSELESS_COMPARISON")
     override fun write(target: JsonElement) {
         // Perhaps? Some mother-f**ker might pass in null using Unsafe.
-        if (target != null)
+        if (target != null) {
             if (target.isJsonObject())
                 writeJsonObject(target.toJsonObject())
             else
                 writeJsonArray(target.toJsonArray())
+        }
         else
             throw JsonIOException("The target to be written is null")
     }

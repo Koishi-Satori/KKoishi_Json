@@ -1,3 +1,4 @@
+import top.kkoishi.json.JsonElement;
 import top.kkoishi.json.annotation.FieldJsonName;
 import top.kkoishi.json.annotation.SerializationIgnored;
 import top.kkoishi.json.io.BasicJsonWriter;
@@ -17,9 +18,19 @@ public final class Test {
         final OutputStream oos = new FileOutputStream("./clz.json");
         final JsonWriter writer = new BasicJsonWriter(new OutputStreamWriter(oos));
         final Node testNode = new Node(114, true, "ee", new Node(514, false, "aa", null));
-        writer.write(Factorys.getFieldTypeFactory().fieldParser().create(new Type<Node>(Node.class)).toJson(testNode));
+        final JsonElement ele = Factorys.getFieldTypeFactory().fieldParser().create(new Type<Node>(Node.class)).toJson(testNode);
+        System.out.println(ele);
+        writer.write(ele);
+        writer.flush();
         writer.close();
         oos.close();
+        final InputStream ins = new FileInputStream("./clz.json");
+        final JsonReader reader = new JsonReader(new InputStreamReader(ins));
+        final Node elem = Factorys.getFactoryFromType(Node.class).create(new Type<Node>(Node.class)).fromJson(reader.read());
+        System.out.println(elem == testNode);
+        System.out.println(elem);
+        reader.close();
+        ins.close();
     }
 
     static class Node {
@@ -28,7 +39,7 @@ public final class Test {
         int a;
 
         @SerializationIgnored
-        boolean flag = true;
+        boolean flag;
 
         String context;
         Node next;
@@ -38,6 +49,16 @@ public final class Test {
             this.flag = flag;
             this.context = context;
             this.next = next;
+        }
+
+        @Override
+        public String toString () {
+            return "Node{" +
+                    "a=" + a +
+                    ", flag=" + flag +
+                    ", context='" + context + '\'' +
+                    ", next=" + next +
+                    '}';
         }
     }
 }
