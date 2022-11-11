@@ -1,7 +1,7 @@
 package top.kkoishi.json
 
-abstract class JsonElement(val typeTag: Byte) {
-    companion object {
+abstract class JsonElement (internal val typeTag: Byte) {
+    internal companion object {
         const val NULL: Byte = 0x00
         const val OBJECT: Byte = 0x01
         const val PRIMITIVE: Byte = 0x02

@@ -146,6 +146,7 @@ abstract class JsonPrimitive : JsonElement(PRIMITIVE) {
         this is JsonInt || this is JsonShort || this is JsonLong || this is JsonByte || this is JsonBigInteger
 
     fun isFloatType(): Boolean = this is JsonFloat || this is JsonDouble || this is JsonBigDecimal
+
     override fun toString(): String {
         return getAsString()
     }

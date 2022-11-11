@@ -3,6 +3,7 @@ package top.kkoishi.json.io
 import top.kkoishi.json.*
 import top.kkoishi.json.annotation.DeserializationIgnored
 import top.kkoishi.json.annotation.SerializationIgnored
+import top.kkoishi.json.exceptions.JsonCastException
 import top.kkoishi.json.exceptions.JsonInvalidFormatException
 import top.kkoishi.json.parse.Factorys
 import top.kkoishi.json.parse.Utils.unsafe
@@ -14,7 +15,7 @@ import java.math.BigInteger
 import java.lang.reflect.Array as ArrayRef
 import kotlin.jvm.Throws
 
-abstract class FieldTypeParser<T>(type: Type<T>) : TypeParser<T>(type) {
+abstract class FieldTypeParser<T> protected constructor(type: Type<T>) : TypeParser<T>(type) {
     protected data class FieldData(var name: String, val field: Field) {
         constructor(field: Field) : this(field.name, field)
     }
@@ -34,8 +35,12 @@ abstract class FieldTypeParser<T>(type: Type<T>) : TypeParser<T>(type) {
         for ((name, field) in deserializeAllFields(obj)) {
             if (field.getAnnotation(DeserializationIgnored::class.java) != null)
                 later.addLast(field)
-            else
-                unsafe.compareAndSwapObject(instance, unsafe.objectFieldOffset(field), null, obj[name])
+            else {
+                unsafe.compareAndSwapObject(instance,
+                    unsafe.objectFieldOffset(field),
+                    defaultValue(field, instance, true),
+                    unwrap(obj[name]!!, field.type))
+            }
         }
         while (later.isNotEmpty()) {
             val f = later.removeFirst()
@@ -81,7 +86,8 @@ abstract class FieldTypeParser<T>(type: Type<T>) : TypeParser<T>(type) {
             Character.TYPE, Character::class.java -> unsafe.getChar(inst, unsafe.objectFieldOffset(f))
             java.lang.Float.TYPE, java.lang.Float::class.java -> unsafe.getFloat(inst, unsafe.objectFieldOffset(f))
             java.lang.Double.TYPE, java.lang.Double::class.java -> unsafe.getDouble(inst, unsafe.objectFieldOffset(f))
-            java.lang.Boolean.TYPE, java.lang.Boolean::class.java -> unsafe.getBoolean(inst, unsafe.objectFieldOffset(f))
+            java.lang.Boolean.TYPE, java.lang.Boolean::class.java -> unsafe.getBoolean(inst,
+                unsafe.objectFieldOffset(f))
             else -> unsafe.getObject(inst, unsafe.objectFieldOffset(f))
         }
     }
@@ -100,6 +106,20 @@ abstract class FieldTypeParser<T>(type: Type<T>) : TypeParser<T>(type) {
     private fun checkPrimitive(v: Any): Boolean {
         val clz = v.javaClass
         return clz.isPrimitive || isWrapClass(clz) || v is BigInteger || v is BigDecimal || v is String
+    }
+
+    private fun unwrap(json: JsonElement, clz: Class<*>): Any? {
+        return when (json.typeTag) {
+            JsonElement.NULL -> null
+            JsonElement.ARRAY -> {
+                if (clz.isArray)
+                    Factorys.getArrayTypeFactory().create(Type(clz)).fromJson(json)
+                throw JsonCastException()
+            }
+            JsonElement.PRIMITIVE -> json.toJsonPrimitive().getAsAny()
+            else ->
+                Factorys.getFactoryFromType(clz).create(Type(clz)).fromJson(json)
+        }
     }
 
     protected fun valueWrap(v: Any?): JsonElement {
@@ -144,7 +164,7 @@ abstract class FieldTypeParser<T>(type: Type<T>) : TypeParser<T>(type) {
 
     @Suppress("UNCHECKED_CAST")
     fun safe(): FieldTypeParser<T> {
-        return object : FieldTypeParserFactory.Companion.DefaultFieldTypeParser<T>(type) {
+        return object : FieldTypeParserFactory.Companion.` DefaultFieldTypeParser`<T>(type) {
             override fun fromJson(json: JsonElement): T {
                 val obj = checkJsonElementType(json)
                 val instance = unsafe.allocateInstance(type.rawType)
@@ -171,7 +191,7 @@ abstract class FieldTypeParser<T>(type: Type<T>) : TypeParser<T>(type) {
 
     @Suppress("UNCHECKED_CAST")
     fun halfSafe(): FieldTypeParser<T> {
-        return object : FieldTypeParserFactory.Companion.DefaultFieldTypeParser<T>(type) {
+        return object : FieldTypeParserFactory.Companion.` DefaultFieldTypeParser`<T>(type) {
             override fun fromJson(json: JsonElement): T {
                 val obj = checkJsonElementType(json)
                 val instance = unsafe.allocateInstance(type.rawType)

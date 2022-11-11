@@ -28,7 +28,7 @@ public final class Test {
         final JsonReader reader = new JsonReader(new InputStreamReader(ins));
         final Node elem = Factorys.getFactoryFromType(Node.class).create(new Type<Node>(Node.class)).fromJson(reader.read());
         System.out.println(elem == testNode);
-        System.out.println(elem);
+        System.out.println(elem.context);
         reader.close();
         ins.close();
     }

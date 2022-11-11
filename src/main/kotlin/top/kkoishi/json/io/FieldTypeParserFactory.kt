@@ -10,13 +10,13 @@ import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 
 class FieldTypeParserFactory private constructor() : TypeParserFactory {
-    internal val defaults: MutableMap<Type<*>, FieldTypeParser<*>> = mutableMapOf()
+    internal val ` defaults`: MutableMap<Type<*>, FieldTypeParser<*>> = mutableMapOf()
 
     internal companion object {
         @JvmStatic
-        internal val instance = FieldTypeParserFactory()
+        internal val ` instance` = FieldTypeParserFactory()
 
-        open class DefaultFieldTypeParser<T>(type: Type<T>) : FieldTypeParser<T>(type) {
+        open class ` DefaultFieldTypeParser`<T>(type: Type<T>) : FieldTypeParser<T>(type) {
             override fun deserializeField(field: Field, o: JsonObject): FieldData {
                 val annotation = field.getDeclaredAnnotation(FieldJsonName::class.java)
                 if (annotation != null) {
@@ -65,11 +65,11 @@ class FieldTypeParserFactory private constructor() : TypeParserFactory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> create(type: Type<T>): TypeParser<T> {
-        var inst = defaults[type]
+        var inst = ` defaults`[type]
         if (inst != null)
             return inst as TypeParser<T>
-        inst = DefaultFieldTypeParser(type)
-        defaults[type] = inst
+        inst = ` DefaultFieldTypeParser`(type)
+        ` defaults`[type] = inst
         return inst
     }
 

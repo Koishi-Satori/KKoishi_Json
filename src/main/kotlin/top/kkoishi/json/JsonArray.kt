@@ -6,7 +6,7 @@ import java.lang.System.arraycopy as arrcpy
 
 class JsonArray : JsonElement, Iterable<JsonElement> {
     internal companion object {
-        internal class Arr(vararg initElements: JsonElement) : Iterable<JsonElement>, MutableList<JsonElement> {
+        private class Arr(vararg initElements: JsonElement) : Iterable<JsonElement>, MutableList<JsonElement> {
             private class ArrIterator @JvmOverloads constructor(val inst: Arr, var pos: Int = 0) :
                 MutableListIterator<JsonElement> {
                 private var right = inst.elements.size - 1
@@ -190,6 +190,8 @@ class JsonArray : JsonElement, Iterable<JsonElement> {
 
     private val array: Arr
 
+    fun size() = array.size
+
     override fun isJsonArray() = true
 
     override fun toJsonArray() = this
@@ -199,6 +201,10 @@ class JsonArray : JsonElement, Iterable<JsonElement> {
     operator fun get(index: Int): JsonElement = array[index]
 
     operator fun set(index: Int, element: JsonElement) = array.set(index, element)
+
+    fun add(element: JsonElement) = array.add(element)
+
+    fun add(index: Int, element: JsonElement) = array.add(index, element)
 
     fun isEmpty() = array.isEmpty()
 
