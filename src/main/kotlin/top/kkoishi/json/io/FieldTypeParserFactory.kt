@@ -64,10 +64,10 @@ class FieldTypeParserFactory private constructor() : TypeParserFactory {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T> create(type: Type<T>): TypeParser<T> {
+    override fun <T> create(type: Type<T>): FieldTypeParser<T> {
         var inst = ` defaults`[type]
         if (inst != null)
-            return inst as TypeParser<T>
+            return inst as FieldTypeParser<T>
         inst = ` DefaultFieldTypeParser`(type)
         ` defaults`[type] = inst
         return inst

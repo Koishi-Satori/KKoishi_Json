@@ -61,7 +61,7 @@ abstract class FieldTypeParser<T> protected constructor(type: Type<T>) : TypePar
         }
     }
 
-    override fun toJson(t: T): JsonElement {
+    override fun toJson(t: T): JsonObject {
         val obj = JsonObject()
         val later = ArrayDeque<FieldData>()
         for (fd in serializeAllFields()) {
@@ -183,7 +183,7 @@ abstract class FieldTypeParser<T> protected constructor(type: Type<T>) : TypePar
                 return instance as T
             }
 
-            override fun toJson(t: T): JsonElement {
+            override fun toJson(t: T): JsonObject {
                 return super.toJson(t)
             }
         }
@@ -210,7 +210,7 @@ abstract class FieldTypeParser<T> protected constructor(type: Type<T>) : TypePar
                 return instance as T
             }
 
-            override fun toJson(t: T): JsonElement {
+            override fun toJson(t: T): JsonObject {
                 return super.toJson(t)
             }
         }

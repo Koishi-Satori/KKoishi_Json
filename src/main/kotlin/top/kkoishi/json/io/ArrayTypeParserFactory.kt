@@ -11,7 +11,7 @@ class ArrayTypeParserFactory private constructor(): TypeParserFactory {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T> create(type: Type<T>): TypeParser<T> {
+    override fun <T> create(type: Type<T>): ArrayTypeParser<T> {
         var inst: ArrayTypeParser<T>? = ` defaults`[type] as ArrayTypeParser<T>?
         if (inst == null) {
             inst = ArrayTypeParser.` getInstance`(type)

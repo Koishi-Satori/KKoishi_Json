@@ -56,7 +56,7 @@ class ArrayTypeParser<T> private constructor(type: Type<T>) : TypeParser<T>(type
         }
     }
 
-    override fun toJson(t: T): JsonElement {
+    override fun toJson(t: T): JsonArray {
         t ?: throw JsonCastException()
         val arr = JsonArray()
         for (index in (0 until length(t)))

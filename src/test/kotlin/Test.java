@@ -1,6 +1,9 @@
+import top.kkoishi.json.JsonArray;
 import top.kkoishi.json.JsonElement;
+import top.kkoishi.json.JsonString;
 import top.kkoishi.json.annotation.FieldJsonName;
 import top.kkoishi.json.annotation.SerializationIgnored;
+import top.kkoishi.json.io.ArrayTypeParser;
 import top.kkoishi.json.io.BasicJsonWriter;
 import top.kkoishi.json.io.JsonReader;
 import top.kkoishi.json.io.JsonWriter;
@@ -8,10 +11,20 @@ import top.kkoishi.json.parse.Factorys;
 import top.kkoishi.json.reflect.Type;
 
 import java.io.*;
+import java.util.Arrays;
 
 public final class Test {
     public static void main (String[] args) throws Exception {
-        testRef();
+        testArrayRef();
+    }
+
+    private static void testArrayRef() throws Exception {
+        final ArrayTypeParser<String[]> parser = Factorys.getArrayTypeFactory().create(new Type<String[]>(String[].class));
+        final String[] arr = {"114", "514", "1919810", "test", "fk", "Touhou Project", "Stellaris"};
+        final JsonArray ja = parser.toJson(arr);
+        System.out.println(ja);
+        ja.add(new JsonString("Heart of Iron IV"));
+        System.out.println(Arrays.toString(parser.getArray(ja)));
     }
 
     private static void testRef () throws Exception {
