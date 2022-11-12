@@ -1,6 +1,6 @@
 package top.kkoishi.json.parse
 
-import sun.misc.Unsafe
+import top.kkoishi.json.internal.Utils
 
 enum class Platform {
     WIN, LINUX, MACOS, UNSUPPORTED
@@ -66,14 +66,3 @@ internal enum class Type {
     BLANKET_END, ARRAY_BLANKET_END
 }
 
-internal object Utils {
-    @JvmStatic
-    private fun accessUnsafe(): Unsafe {
-        val f = Unsafe::class.java.getDeclaredField("theUnsafe")
-        f.isAccessible = true
-        return f[null] as Unsafe
-    }
-
-    @JvmStatic
-    val unsafe = accessUnsafe()
-}

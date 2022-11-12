@@ -1,4 +1,4 @@
-package top.kkoishi.json.io
+package top.kkoishi.json.internal.io
 
 import java.io.IOException
 import java.io.InputStream

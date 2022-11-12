@@ -6,7 +6,8 @@ import top.kkoishi.json.annotation.SerializationIgnored
 import top.kkoishi.json.exceptions.JsonCastException
 import top.kkoishi.json.exceptions.JsonInvalidFormatException
 import top.kkoishi.json.parse.Factorys
-import top.kkoishi.json.parse.Utils.unsafe
+import top.kkoishi.json.internal.Utils.unsafe
+import top.kkoishi.json.internal.reflect.Allocators
 import top.kkoishi.json.reflect.Type
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -15,7 +16,7 @@ import java.math.BigInteger
 import java.lang.reflect.Array as ArrayRef
 import kotlin.jvm.Throws
 
-abstract class FieldTypeParser<T> protected constructor(type: Type<T>) : TypeParser<T>(type) {
+abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : TypeParser<T>(type) {
     protected data class FieldData(var name: String, val field: Field) {
         constructor(field: Field) : this(field.name, field)
     }
@@ -191,10 +192,11 @@ abstract class FieldTypeParser<T> protected constructor(type: Type<T>) : TypePar
 
     @Suppress("UNCHECKED_CAST")
     fun halfSafe(): FieldTypeParser<T> {
+        val allocator = Allocators.unsafe<T>()
         return object : FieldTypeParserFactory.Companion.` DefaultFieldTypeParser`<T>(type) {
             override fun fromJson(json: JsonElement): T {
                 val obj = checkJsonElementType(json)
-                val instance = unsafe.allocateInstance(type.rawType)
+                val instance = allocator.allocateInstance(type)
                 val later = ArrayDeque<Field>()
                 for ((name, field) in deserializeAllFields(obj)) {
                     if (field.getAnnotation(DeserializationIgnored::class.java) != null)

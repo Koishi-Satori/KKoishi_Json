@@ -1,9 +1,9 @@
-package top.kkoishi.json.reflect
+package top.kkoishi.json.internal.reflect
 
-import sun.misc.Unsafe
 import top.kkoishi.json.Utils
-import top.kkoishi.json.parse.Utils.unsafe
 import top.kkoishi.json.exceptions.UnsupportedException
+import top.kkoishi.json.reflect.Type
+import java.io.ObjectInputStream
 import java.lang.reflect.Modifier
 
 internal object Allocators {
@@ -28,7 +28,9 @@ internal object Allocators {
     @Suppress("UNCHECKED_CAST")
     fun <T : Any> unsafe(): InstanceAllocator<T> {
         try {
-            val allocator = Unsafe::class.java.getDeclaredMethod("allocateInstance", Class::class.java)
+            val clz = Class.forName("sun.misc.Unsafe")
+            val allocator = clz.getDeclaredMethod("allocateInstance", Class::class.java)
+            val unsafe = clz.getDeclaredField("theUnsafe")
             return object : InstanceAllocator<T> {
                 override fun allocateInstance(typeofT: Type<T>): T {
                     checkInstantiable(typeofT.rawType)

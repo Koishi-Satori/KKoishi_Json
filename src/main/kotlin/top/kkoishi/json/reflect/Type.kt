@@ -1,5 +1,6 @@
 package top.kkoishi.json.reflect
 
+import top.kkoishi.json.internal.reflect.Reflection
 import java.lang.reflect.Type
 
 class Type<T> private constructor(val type: Type, val rawType: Class<in T>) {

@@ -1,4 +1,4 @@
-package top.kkoishi.json.reflect
+package top.kkoishi.json.internal.reflect
 
 import java.io.Serializable
 import java.lang.reflect.*
