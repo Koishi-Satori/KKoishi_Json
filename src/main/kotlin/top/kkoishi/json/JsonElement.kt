@@ -1,5 +1,12 @@
 package top.kkoishi.json
 
+/**
+ * The base type of all json types, and its sub-classes are JsonObject, JsonPrimitive, JsonNull and JsonArray.
+ *
+ * The json root type can be JsonObject and JsonArray.
+ *
+ * @author KKoishi_
+ */
 abstract class JsonElement (internal val typeTag: Byte) {
     internal companion object {
         const val NULL: Byte = 0x00

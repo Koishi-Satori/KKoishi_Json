@@ -11,6 +11,7 @@ import java.lang.reflect.Modifier
 
 class FieldTypeParserFactory private constructor() : TypeParserFactory {
     internal val ` defaults`: MutableMap<Type<*>, FieldTypeParser<*>> = mutableMapOf()
+    internal val ` safety`: MutableMap<Type<*>, FieldTypeParser<*>> = mutableMapOf()
 
     internal companion object {
         @JvmStatic
@@ -70,6 +71,26 @@ class FieldTypeParserFactory private constructor() : TypeParserFactory {
             return inst as FieldTypeParser<T>
         inst = ` DefaultFieldTypeParser`(type)
         ` defaults`[type] = inst
+        return inst
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T: Any> createSafety(type: Type<T>, tryUnsafe: Boolean = true): FieldTypeParser<T> {
+        var inst = ` safety`[type]
+        if (inst != null)
+            return inst as FieldTypeParser<T>
+        inst = create(type).safe(tryUnsafe)
+        ` safety`[type] = inst
+        return inst
+    }
+
+    fun <T: Any> createByAllocator(type: Type<T>, allocator: ((Class<T>) -> T), replace: Boolean = true): FieldTypeParser<T> {
+        val inst = object : ` DefaultFieldTypeParser`<T>(type) {
+            @Suppress("UNCHECKED_CAST")
+            override fun newInstance(clz: Class<*>): Any = allocator(type.rawType as Class<T>)
+        }
+        if (replace)
+            ` safety`[type] = inst
         return inst
     }
 

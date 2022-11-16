@@ -30,22 +30,74 @@ import java.math.BigInteger
 import java.lang.reflect.Array as ArrayRef
 import kotlin.jvm.Throws
 
+/**
+ * This is a type parser with a capacity to serialize/deserialize a json object to an instance of a given class by
+ * parsing key-value entry to the value hold by the non-static fields of the class.
+ *
+ * The ```fromJson``` and ```toJson``` method might be unsafe or directly throw a ```UnsupportedException```, for
+ * them default use methods in unsafe to allocate instance and fill the fields.
+ * You can invoke the ```safe``` method to create a safety parser.
+ *
+ * The safe way to create an instance is invoking ```FieldTypeParserFactory.create``` method, and you can use methods in
+ * ```Factorys``` to get the TypeParserFactory instance. We do not recommend you to directly create a sub-class of
+ * this, and if you really want to do that, you'd better to extend the ```AbstractFieldTypeParser``` class, so that
+ * Factorys can get the instance of it.
+ *
+ * If you need special way to allocate the instance, you can invoke ```FieldTypeParserFactory.createByAllocator```.
+ *
+ * If some fields want to be ignored when serialize/deserialize, you can use
+ * ```SerializationIgnored```/```DeserializationIgnored``` annotation.
+ * The only field of them is ```defaultValueGetter``` (String), it is used to get the default value.
+ * That is the name of a method, which returns the value and has no parameter.
+ * If the method does not exist or this field is empty, the annotated field will be set to the default value
+ * determined by the field's type.
+ * If the type is primitive, then they have special value like 0, or it will be ```null```.
+ *
+ * If the field's name and the key of entry in json object are not the same(but they are associated), you can use the
+ * ```FieldJsonName``` annotation to custom the serialize/deserialize process.
+ * The ```name``` field is the desired name default be used when serialize/deserialize, and if it is incorrect when
+ * deserialize, this class will test all the value in string array field ```alternate```.
+ *
+ * @author KKoishi_
+ */
 abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : TypeParser<T>(type) {
     protected data class FieldData(var name: String, val field: Field) {
         constructor(field: Field) : this(field.name, field)
     }
 
+    /**
+     * Check if the input json element is json object, if not, then throw a ```JsonInvalidFormatException```, or
+     * return a json object.
+     *
+     * @param json The input json element.
+     * @return Json object after cast.
+     * @throws JsonInvalidFormatException - When the input is not a instance of JsonObject.
+     */
     private fun checkJsonElementType(json: JsonElement): JsonObject {
         if (json.isJsonObject())
             return json.toJsonObject()
         throw JsonInvalidFormatException("The field type parser can only accept json object.")
     }
 
+    /**
+     * The instance allocator method, used to allocate instance from the given class.
+     *
+     * @param clz The class of instance.
+     * @return instance with all fields in default value.
+     */
+    open fun newInstance(clz: Class<*>): Any = allocateInstance(clz)
+
     @Suppress("UNCHECKED_CAST")
     @Throws(JsonInvalidFormatException::class)
     override fun fromJson(json: JsonElement): T {
+        // check if input is JsonObject, and allocate instance using sun.misc.Unsafe
         val obj = checkJsonElementType(json)
-        val instance = allocateInstance(type.rawType)
+        val instance = newInstance(type.rawType)
+
+        // All the field need to be later initialized are stored here, for some getter method might use the fields
+        // already initialized.
+        // When traversing the non-static fields, all the field annotated by DeserializationIgnored will be added
+        // to the later-initialized deque, and other field will be handled by unsafeSetValue method.
         val later = ArrayDeque<Field>()
         for ((name, field) in deserializeAllFields(obj)) {
             if (field.getAnnotation(DeserializationIgnored::class.java) != null)
@@ -53,10 +105,12 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
             else {
                 unsafeSetValue(instance,
                     field,
-                    allocatedValue(field),
+                    initializedValue(field),
                     unwrap(obj[name]!!, field.type))
             }
         }
+
+        // Traversing the later-initialized fields, and use defaultValue method to get value to be filled.
         while (later.isNotEmpty()) {
             val f = later.removeFirst()
             unsafeSetValue(instance, f, null, defaultValue(f, instance, true))
@@ -64,13 +118,31 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
         return instance as T
     }
 
-    private fun allocatedValue(field: Field): Any? {
+    /**
+     * Get the default value of field when initializing.
+     *
+     * @param field the field to be filled.
+     * @return value.
+     */
+    private fun initializedValue(field: Field): Any? {
         val clz = field.type
         if (clz.isPrimitive)
             return primitiveDefaultValue(clz)
         return null
     }
 
+    /**
+     * Use unsafe method to set the value of the field in the given instance.
+     *
+     * @param inst The instance.
+     * @param f The field to be filled.
+     * @param expect The current value of the field.
+     * @param value The new value of the field.
+     * @return if successfully set the value.
+     * @see compareAndSwapLong
+     * @see compareAndSwapInt
+     * @see compareAndSwapObject
+     */
     @Suppress("UNUSED_PARAMETER", "SameParameterValue")
     private fun unsafeSetValue(inst: Any, f: Field, expect: Any?, value: Any?): Boolean {
         return when (f.type) {
@@ -86,14 +158,26 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
         }
     }
 
+    /**
+     * Get the default value of the field.
+     *
+     * @param field The field.
+     * @param inst The instance of the class.
+     * @param deserialization Whether deserialization.
+     * @return The default value.
+     */
     protected abstract fun defaultValue(field: Field, inst: Any, deserialization: Boolean = false): Any?
 
+    /**
+     * The default value of primitive class.
+     */
     protected fun primitiveDefaultValue(clazz: Class<*>): Any? {
         return when (clazz) {
             Integer.TYPE, java.lang.Long.TYPE, java.lang.Short.TYPE, java.lang.Byte.TYPE -> 0
             Character.TYPE -> '\u0000'
             java.lang.Float.TYPE, java.lang.Double.TYPE -> 0.0
             java.lang.Boolean.TYPE -> false
+            // This should not be returned.
             else -> null
         }
     }
@@ -105,15 +189,22 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
             if (fd.field.getAnnotation(SerializationIgnored::class.java) != null)
                 later.addLast(fd)
             else
-                obj[fd.name] = valueWrap(unsafeGetField(fd.field, t))
+                obj[fd.name] = wrap(unsafeGetField(fd.field, t))
         }
         while (later.isNotEmpty()) {
             val fd = later.removeFirst()
-            obj[fd.name] = valueWrap(defaultValue(fd.field, t as Any))
+            obj[fd.name] = wrap(defaultValue(fd.field, t as Any))
         }
         return obj
     }
 
+    /**
+     * Use unsafe method to get current value of the given field.
+     *
+     * @param f Thr given field.
+     * @param inst The instance of the class.
+     * @return The current value.
+     */
     private fun unsafeGetField(f: Field, inst: T): Any? {
         return when (f.type) {
             Integer.TYPE, Integer::class.java -> getInt(inst, objectFieldOffset(f))
@@ -129,6 +220,12 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
         }
     }
 
+    /**
+     * Check if the class is the wrapped class of jvm primitive type.
+     *
+     * @param clz The class to be checked.
+     * @return true if is.
+     */
     private fun isWrapClass(clz: Class<*>): Boolean {
         return clz == Integer::class.java
                 || clz == java.lang.Long::class.java
@@ -140,11 +237,23 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
                 || clz == java.lang.Boolean::class.java
     }
 
+    /**
+     * Check if the class can be converted to JsonPrimitive.
+     */
     private fun checkPrimitive(v: Any): Boolean {
         val clz = v.javaClass
         return clz.isPrimitive || isWrapClass(clz) || v is BigInteger || v is BigDecimal || v is String
     }
 
+    /**
+     * Unwrap the json element to a instance of the given type.
+     *
+     * @param json The json element.
+     * @param clz The class to be converted.
+     * @param safe If this method use safety FieldTypeParser when parsing json object.
+     * @param tryUnsafe if try unsafe when use safe.
+     * @return unwrapped value.
+     */
     private fun <Type> unwrap(
         json: JsonElement,
         clz: Class<Type>,
@@ -170,7 +279,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
         }
     }
 
-    protected fun valueWrap(v: Any?): JsonElement {
+    protected fun wrap(v: Any?): JsonElement {
         if (v == null)
             return JsonNull()
         if (checkPrimitive(v))
@@ -180,7 +289,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
             val len = ArrayRef.getLength(v)
             val elements = ArrayDeque<JsonElement>(len)
             for (index in 0 until len)
-                elements.addLast(valueWrap(ArrayRef.get(v, index)))
+                elements.addLast(wrap(ArrayRef.get(v, index)))
             return JsonArray(elements)
         }
         return Factorys.getFactoryFromType(clz).create(Type(clz)).toJson(v)
