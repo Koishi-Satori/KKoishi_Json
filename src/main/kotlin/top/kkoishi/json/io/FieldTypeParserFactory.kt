@@ -16,7 +16,7 @@ class FieldTypeParserFactory private constructor() : TypeParserFactory {
         @JvmStatic
         internal val ` instance` = FieldTypeParserFactory()
 
-        open class ` DefaultFieldTypeParser`<T>(type: Type<T>) : FieldTypeParser<T>(type) {
+        open class ` DefaultFieldTypeParser`<T : Any>(type: Type<T>) : FieldTypeParser<T>(type) {
             override fun deserializeField(field: Field, o: JsonObject): FieldData {
                 val annotation = field.getDeclaredAnnotation(FieldJsonName::class.java)
                 if (annotation != null) {
@@ -64,7 +64,7 @@ class FieldTypeParserFactory private constructor() : TypeParserFactory {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T> create(type: Type<T>): FieldTypeParser<T> {
+    override fun <T : Any> create(type: Type<T>): FieldTypeParser<T> {
         var inst = ` defaults`[type]
         if (inst != null)
             return inst as FieldTypeParser<T>

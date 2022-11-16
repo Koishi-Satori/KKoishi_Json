@@ -13,13 +13,14 @@ object Utils {
 
 class JsonInt(override var intValue: Int) : JsonPrimitive() {
     override fun getAsString(): String = intValue.toString()
-
     override fun getAsAny(): Any = intValue
+    override fun getAsNumber(): Number = intValue
 }
 
 class JsonLong(override var longValue: Long) : JsonPrimitive() {
     override fun getAsAny(): Any = longValue
     override fun getAsString(): String = longValue.toString()
+    override fun getAsNumber(): Number = longValue
 }
 
 class JsonChar(override var charValue: Char) : JsonPrimitive() {
@@ -30,21 +31,25 @@ class JsonChar(override var charValue: Char) : JsonPrimitive() {
 class JsonShort(override var shortValue: Short) : JsonPrimitive() {
     override fun getAsAny(): Any = shortValue
     override fun getAsString(): String = shortValue.toString()
+    override fun getAsNumber(): Number = shortValue
 }
 
 class JsonFloat(override var floatValue: Float) : JsonPrimitive() {
     override fun getAsAny(): Any = floatValue
     override fun getAsString(): String = floatValue.toString()
+    override fun getAsNumber(): Number = floatValue
 }
 
 class JsonDouble(override var doubleValue: Double) : JsonPrimitive() {
     override fun getAsAny(): Any = doubleValue
     override fun getAsString(): String = doubleValue.toString()
+    override fun getAsNumber(): Number = doubleValue
 }
 
 class JsonByte(override var byteValue: Byte) : JsonPrimitive() {
     override fun getAsAny(): Any = byteValue
     override fun getAsString(): String = byteValue.toString()
+    override fun getAsNumber(): Number = byteValue
 }
 
 class JsonString(override var stringValue: String) : JsonPrimitive() {
@@ -103,6 +108,7 @@ class JsonBigInteger(var value: BigInteger) : JsonPrimitive() {
     }
 
     override fun getAsString(): String = value.toString()
+    override fun getAsNumber(): Number = longValue
 }
 
 class JsonBigDecimal(var value: BigDecimal) : JsonPrimitive() {
@@ -115,4 +121,5 @@ class JsonBigDecimal(var value: BigDecimal) : JsonPrimitive() {
         set(value) {}
 
     override fun getAsString(): String = value.toString()
+    override fun getAsNumber(): Number = doubleValue
 }

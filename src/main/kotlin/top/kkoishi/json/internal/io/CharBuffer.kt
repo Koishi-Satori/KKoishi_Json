@@ -7,6 +7,7 @@ import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.bufferedReader
 
+@Deprecated("")
 internal interface CharBuffer : Iterable<Char> {
     companion object {
         @JvmStatic

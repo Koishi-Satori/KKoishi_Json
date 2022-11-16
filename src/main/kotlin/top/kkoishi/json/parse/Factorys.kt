@@ -22,6 +22,8 @@ object Factorys {
     fun getFactoryFromType(type: Class<*>): TypeParserFactory {
         if (spec.containsKey(type))
             return spec[type]!!
+        if (type.isArray)
+            return getArrayTypeFactory()
         return getFieldTypeFactory()
     }
 }

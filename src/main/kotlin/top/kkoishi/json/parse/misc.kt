@@ -13,11 +13,11 @@ enum class NumberMode {
 internal data class Token @JvmOverloads constructor(val type: Type, var content: String = "") {
     companion object {
         @JvmStatic
-        private val offset: Long = Utils.unsafe.objectFieldOffset(Token::class.java.getDeclaredField("type"))
+        private val offset: Long = Utils.objectFieldOffset(Token::class.java.getDeclaredField("type"))
 
         @JvmStatic
         private fun createTypeOnlyToken(t: Type?): Token {
-            with(Utils.unsafe) {
+            with(Utils) {
                 val inst = allocateInstance(Token::class.java)
                 compareAndSwapObject(inst, offset, null, t)
                 return inst as Token

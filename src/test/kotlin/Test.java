@@ -15,7 +15,8 @@ import java.util.Arrays;
 
 public final class Test {
     public static void main (String[] args) throws Exception {
-        testArrayRef();
+        testRef();
+        //testArrayRef();
     }
 
     private static void testArrayRef() throws Exception {
@@ -41,6 +42,7 @@ public final class Test {
         final JsonReader reader = new JsonReader(new InputStreamReader(ins));
         final Node elem = Factorys.getFactoryFromType(Node.class).create(new Type<Node>(Node.class)).fromJson(reader.read());
         System.out.println(elem == testNode);
+        System.out.println("qaq: " + elem + "\nqwq: " + testNode);
         System.out.println(elem.context);
         reader.close();
         ins.close();

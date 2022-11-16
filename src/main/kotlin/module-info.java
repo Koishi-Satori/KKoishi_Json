@@ -9,4 +9,5 @@ module kkoishi.json {
     requires java.sql;
     requires static jdk.unsupported;
     requires kotlin.stdlib;
+    requires kotlin.stdlib.jdk7;
 }

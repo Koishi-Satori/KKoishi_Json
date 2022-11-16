@@ -44,6 +44,22 @@ abstract class JsonPrimitive : JsonElement(PRIMITIVE) {
                 }
             }
         }
+
+        @JvmStatic
+        fun JsonPrimitive.toPrimitive(clz: Class<*>): Any {
+            return when (clz) {
+                Integer.TYPE, Integer::class.java -> getAsNumber().toInt()
+                java.lang.Long.TYPE, java.lang.Long::class.java -> getAsNumber().toLong()
+                java.lang.Byte.TYPE, java.lang.Byte::class.java -> getAsNumber().toByte()
+                java.lang.Short.TYPE, java.lang.Short::class.java -> getAsNumber().toShort()
+                Character.TYPE, Character::class.java -> charValue
+                java.lang.Float.TYPE, java.lang.Float::class.java -> getAsNumber().toFloat()
+                java.lang.Double.TYPE, java.lang.Double::class.java -> getAsNumber().toDouble()
+                java.lang.Boolean.TYPE, java.lang.Boolean::class.java -> boolValue
+                String::class.java -> getAsString()
+                else -> clz.cast(this.getAsAny())
+            }
+        }
     }
 
     final override fun isJsonPrimitive(): Boolean = true
@@ -91,6 +107,8 @@ abstract class JsonPrimitive : JsonElement(PRIMITIVE) {
     }
 
     abstract fun getAsString(): String
+
+    open fun getAsNumber(): Number = Utils.uoe("Can not cast to number")
 
     abstract fun getAsAny(): Any
 

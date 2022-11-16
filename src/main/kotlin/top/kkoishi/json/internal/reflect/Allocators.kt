@@ -4,6 +4,7 @@ import top.kkoishi.json.Utils
 import top.kkoishi.json.exceptions.UnsupportedException
 import top.kkoishi.json.reflect.Type
 import java.io.ObjectInputStream
+import java.io.ObjectStreamClass
 import java.lang.reflect.Modifier
 
 internal object Allocators {
@@ -26,27 +27,49 @@ internal object Allocators {
 
     @JvmStatic
     @Suppress("UNCHECKED_CAST")
-    fun <T : Any> unsafe(): InstanceAllocator<T> {
+    fun <T : Any> unsafe(tryUnsafe: Boolean): InstanceAllocator<T> {
+        if (tryUnsafe) {
+            try {
+                val clz = Class.forName("sun.misc.Unsafe")
+                val allocateInstance = clz.getDeclaredMethod("allocateInstance", Class::class.java)
+                val unsafeField = clz.getDeclaredField("theUnsafe")
+                unsafeField.isAccessible = true
+                val unsafe = unsafeField[null]
+                return object : InstanceAllocator<T> {
+                    override fun allocateInstance(typeofT: Type<T>): T {
+                        checkInstantiable(typeofT.rawType)
+                        return allocateInstance(unsafe, typeofT.type) as T
+                    }
+
+                    override fun allocateInstance(clz: Class<T>): T {
+                        checkInstantiable(clz)
+                        return allocateInstance(unsafe, clz) as T
+                    }
+                }
+            } catch (e: Exception) {
+            }
+        }
+
         try {
-            val clz = Class.forName("sun.misc.Unsafe")
-            val allocator = clz.getDeclaredMethod("allocateInstance", Class::class.java)
-            val unsafe = clz.getDeclaredField("theUnsafe")
+            val getConstructorId = ObjectStreamClass::class.java.getDeclaredMethod("getConstructorId", Class::class.java)
+            getConstructorId.isAccessible = true
+            val id = getConstructorId(null, Any::class.java) as Int
+            val newInstance = ObjectInputStream::class.java.getDeclaredMethod("newInstance", Class::class.java, Integer.TYPE)
+            newInstance.isAccessible = true
             return object : InstanceAllocator<T> {
                 override fun allocateInstance(typeofT: Type<T>): T {
-                    checkInstantiable(typeofT.rawType)
-                    return allocator(unsafe, typeofT.type) as T
+                    with (typeofT.rawType) {
+                        checkInstantiable(this)
+                        return newInstance(null, this, id) as T
+                    }
                 }
 
                 override fun allocateInstance(clz: Class<T>): T {
                     checkInstantiable(clz)
-                    return allocator(unsafe, clz) as T
+                    return newInstance(null, clz, id) as T
                 }
-            }
-        } catch (e: Exception) {
-        }
 
-        try {
-            TODO()
+            }
         } catch (e: Exception) {
         }
 
