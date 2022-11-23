@@ -7,25 +7,34 @@ import top.kkoishi.json.io.ArrayTypeParser;
 import top.kkoishi.json.io.BasicJsonWriter;
 import top.kkoishi.json.io.JsonReader;
 import top.kkoishi.json.io.JsonWriter;
+import top.kkoishi.json.io.MapTypeParserFactory;
 import top.kkoishi.json.parse.Factorys;
 import top.kkoishi.json.reflect.Type;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.HashMap;
+
+import static java.lang.System.out;
 
 public final class Test {
     public static void main (String[] args) throws Exception {
-        testRef();
+        //testRef();
         //testArrayRef();
+        testMapRef();
+    }
+
+    private static void testMapRef() throws Exception {
+        // Not passed.
     }
 
     private static void testArrayRef() throws Exception {
         final ArrayTypeParser<String[]> parser = Factorys.getArrayTypeFactory().create(new Type<String[]>(String[].class));
         final String[] arr = {"114", "514", "1919810", "test", "fk", "Touhou Project", "Stellaris"};
         final JsonArray ja = parser.toJson(arr);
-        System.out.println(ja);
+        out.println(ja);
         ja.add(new JsonString("Heart of Iron IV"));
-        System.out.println(Arrays.toString(parser.getArray(ja)));
+        out.println(Arrays.toString(parser.getArray(ja)));
     }
 
     private static void testRef () throws Exception {
@@ -33,17 +42,17 @@ public final class Test {
         final JsonWriter writer = new BasicJsonWriter(new OutputStreamWriter(oos));
         final Node testNode = new Node(114, true, "ee", new Node(514, false, "aa", null));
         final JsonElement ele = Factorys.getFieldTypeFactory().fieldParser().create(new Type<Node>(Node.class)).toJson(testNode);
-        System.out.println(ele);
+        out.println(ele);
         writer.write(ele);
         writer.flush();
         writer.close();
         oos.close();
         final InputStream ins = new FileInputStream("./clz.json");
         final JsonReader reader = new JsonReader(new InputStreamReader(ins));
-        final Node elem = Factorys.getFactoryFromType(Node.class).create(new Type<Node>(Node.class)).fromJson(reader.read());
-        System.out.println(elem == testNode);
-        System.out.println("qaq: " + elem + "\nqwq: " + testNode);
-        System.out.println(elem.context);
+        final Node elem = Factorys.getFactoryFromType(Node.class).create(new Type<>(Node.class)).fromJson(reader.read());
+        out.println(elem == testNode);
+        out.println("qaq: " + elem + "\nqwq: " + testNode);
+        out.println(elem.context);
         reader.close();
         ins.close();
     }

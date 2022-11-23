@@ -1,15 +1,42 @@
 package top.kkoishi.json.reflect
 
 import top.kkoishi.json.internal.reflect.Reflection
+import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-class Type<T> private constructor(val type: Type, val rawType: Class<in T>) {
-    val hashcode: Int = type.hashCode()
+class Type<T> : TypeHelper.TypeToken<T>, TypeResolver<T> {
+    private val type: Type
+    private val rawType: Class<in T>
+    private val hashcode: Int
+
+    private constructor(type: Type, rawType: Class<in T>) {
+        this.type = type
+        this.rawType = rawType
+        hashcode = this.type.hashCode()
+    }
 
     @Suppress("UNCHECKED_CAST")
-    constructor(type: Type): this(Reflection.ensureCanonical(type), Reflection.getRawType(type) as Class<in T>)
+    constructor(type: Type) : this(Reflection.ensureCanonical(type), Reflection.getRawType(type) as Class<in T>)
 
-    constructor(rawType: Class<in T>): this(Reflection.ensureCanonical(rawType), rawType)
+    @Suppress("UNCHECKED_CAST")
+    constructor(clz: Class<in T>) {
+        if (clz.genericInterfaces.isNotEmpty()){
+            val sup = clz.genericInterfaces[0]
+            type = if (sup is ParameterizedType) {
+                Reflection.canonicalize(sup.actualTypeArguments[0])
+            } else {
+                Reflection.canonicalize(clz)
+            }
+        } else {
+            type = Reflection.canonicalize(clz)
+        }
+        rawType = Reflection.getRawType(type) as Class<in T>
+        hashcode = type.hashCode()
+    }
+
+    override fun type() = type
+
+    override fun rawType() = rawType
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -20,4 +47,10 @@ class Type<T> private constructor(val type: Type, val rawType: Class<in T>) {
     }
 
     override fun hashCode(): Int = hashcode
+
+    override fun toString(): String {
+        return "Type{type=$type, rawType=$rawType}"
+    }
+
+
 }

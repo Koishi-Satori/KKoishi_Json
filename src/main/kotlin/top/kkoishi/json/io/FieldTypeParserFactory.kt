@@ -42,7 +42,7 @@ class FieldTypeParserFactory private constructor() : TypeParserFactory {
 
             private fun checkGetter(getterName: String): Method? {
                 return try {
-                    type.rawType.getDeclaredMethod(getterName)
+                    type.rawType().getDeclaredMethod(getterName)
                 } catch (e: NoSuchMethodException) { null }
             }
 
@@ -87,7 +87,7 @@ class FieldTypeParserFactory private constructor() : TypeParserFactory {
     fun <T: Any> createByAllocator(type: Type<T>, allocator: ((Class<T>) -> T), replace: Boolean = true): FieldTypeParser<T> {
         val inst = object : ` DefaultFieldTypeParser`<T>(type) {
             @Suppress("UNCHECKED_CAST")
-            override fun newInstance(clz: Class<*>): Any = allocator(type.rawType as Class<T>)
+            override fun newInstance(clz: Class<*>): Any = allocator(type.rawType() as Class<T>)
         }
         if (replace)
             ` safety`[type] = inst

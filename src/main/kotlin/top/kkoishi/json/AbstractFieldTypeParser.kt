@@ -40,7 +40,7 @@ abstract class AbstractFieldTypeParser<T : Any>(type: Type<T>) : FieldTypeParser
 
     protected open fun checkGetter(getterName: String): Method? {
         return try {
-            type.rawType.getDeclaredMethod(getterName)
+            type.rawType().getDeclaredMethod(getterName)
         } catch (e: NoSuchMethodException) { null }
     }
 

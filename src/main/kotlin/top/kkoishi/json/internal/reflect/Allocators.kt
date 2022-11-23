@@ -37,8 +37,8 @@ internal object Allocators {
                 val unsafe = unsafeField[null]
                 return object : InstanceAllocator<T> {
                     override fun allocateInstance(typeofT: Type<T>): T {
-                        checkInstantiable(typeofT.rawType)
-                        return allocateInstance(unsafe, typeofT.type) as T
+                        checkInstantiable(typeofT.rawType())
+                        return allocateInstance(unsafe, typeofT.type()) as T
                     }
 
                     override fun allocateInstance(clz: Class<T>): T {
@@ -58,7 +58,7 @@ internal object Allocators {
             newInstance.isAccessible = true
             return object : InstanceAllocator<T> {
                 override fun allocateInstance(typeofT: Type<T>): T {
-                    with (typeofT.rawType) {
+                    with (typeofT.rawType()) {
                         checkInstantiable(this)
                         return newInstance(null, this, id) as T
                     }

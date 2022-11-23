@@ -9,6 +9,7 @@ import top.kkoishi.json.JsonPrimitive
 import top.kkoishi.json.exceptions.JsonCastException
 import top.kkoishi.json.parse.Factorys
 import top.kkoishi.json.reflect.Type
+import java.lang.reflect.GenericArrayType
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.lang.reflect.Array.newInstance as arrayInstance
@@ -23,13 +24,14 @@ class ArrayTypeParser<T> private constructor(type: Type<T>) : TypeParser<T>(type
     }
 
     init {
-        if (!type.rawType.isArray)
-            throw IllegalArgumentException("The type ${type.rawType} should be a array type")
+        // TODO: replace the array check.
+        if (!(type.rawType().isArray || type.type() is GenericArrayType))
+            throw IllegalArgumentException("The type ${type.rawType()} should be a array type")
     }
 
     override fun fromJson(json: JsonElement): T {
         val old = parseImpl(json)
-        val arr = arrayInstance(type.rawType.componentType, old.size) as T
+        val arr = arrayInstance(type.rawType().componentType, old.size) as T
         for ((index, value) in old.withIndex())
             setElement(arr, index, value)
         return arr
@@ -69,7 +71,7 @@ class ArrayTypeParser<T> private constructor(type: Type<T>) : TypeParser<T>(type
             return JsonNull()
         val clz = v.javaClass
         if (clz.isArray)
-            return Factorys.getArrayTypeFactory().create(Type(clz)).toJson(v)
+            return Factorys.getArrayTypeFactory().create<Any>(Type(clz)).toJson(v)
         if (checkPrimitive(v))
             return JsonPrimitive.createActual(v)
         return Factorys.getFactoryFromType(clz).create(Type(clz)).toJson(v)

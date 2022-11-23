@@ -1,7 +1,5 @@
 package top.kkoishi.json
 
-import java.io.Serializable
-
 class JsonObject : JsonElement, Iterable<Pair<String, JsonElement>> {
     private val content: MutableMap<String, JsonElement>
 
@@ -31,6 +29,8 @@ class JsonObject : JsonElement, Iterable<Pair<String, JsonElement>> {
             keys.remove(k)
         return content.remove(k)
     }
+
+    fun size() = content.size
 
     fun entries(): Set<Pair<String, JsonElement>> = keys.map { Pair(it, content[it]!!) }.toSet()
 

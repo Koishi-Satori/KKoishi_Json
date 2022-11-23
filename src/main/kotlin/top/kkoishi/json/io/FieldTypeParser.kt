@@ -92,7 +92,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
     override fun fromJson(json: JsonElement): T {
         // check if input is JsonObject, and allocate instance using sun.misc.Unsafe
         val obj = checkJsonElementType(json)
-        val instance = newInstance(type.rawType)
+        val instance = newInstance(type.rawType())
 
         // All the field need to be later initialized are stored here, for some getter method might use the fields
         // already initialized.
@@ -298,7 +298,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
     private fun wrapJsonPrimitive(v: Any): JsonPrimitive = JsonPrimitive.createActual(v)
 
     protected open fun serializeAllFields(): ArrayDeque<FieldData> {
-        val declaredFields = type.rawType.declaredFields
+        val declaredFields = type.rawType().declaredFields
         val fields: ArrayDeque<FieldData> = ArrayDeque(declaredFields.size)
         for (field in declaredFields)
             if (!Modifier.isStatic(field.modifiers))
@@ -309,7 +309,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
     protected abstract fun serializeField(field: Field): FieldData
 
     protected open fun deserializeAllFields(o: JsonObject): ArrayDeque<FieldData> {
-        val declaredFields = type.rawType.declaredFields
+        val declaredFields = type.rawType().declaredFields
         val fields: ArrayDeque<FieldData> = ArrayDeque(declaredFields.size)
         for (field in declaredFields)
             if (!Modifier.isStatic(field.modifiers))
@@ -345,7 +345,21 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
             }
 
             override fun toJson(t: T): JsonObject {
-                TODO()
+                val obj = JsonObject()
+                val later = ArrayDeque<FieldData>()
+                for (fd in serializeAllFields()) {
+                    if (fd.field.getAnnotation(SerializationIgnored::class.java) != null)
+                        later.addLast(fd)
+                    else {
+                        fd.field.isAccessible = true
+                        obj[fd.name] = wrap(fd.field[t])
+                    }
+                }
+                while (later.isNotEmpty()) {
+                    val fd = later.removeFirst()
+                    obj[fd.name] = wrap(defaultValue(fd.field, t as Any))
+                }
+                return obj
             }
         }
     }
