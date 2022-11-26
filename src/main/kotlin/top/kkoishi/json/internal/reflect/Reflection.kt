@@ -34,8 +34,10 @@ internal object Reflection {
     @JvmStatic
     internal fun isMapType(type: Class<*>): Boolean = isType(type, Map::class.java)
 
+    internal fun isCollection(type: Class<*>): Boolean = isType(type, Collection::class.java)
+
     @JvmStatic
-    fun isType(type: KType<*>, clz: Class<*>): Boolean {
+    internal fun isType(type: KType<*>, clz: Class<*>): Boolean {
         val tp = type.type()
         if (tp is Class<*>)
             return isType(tp, clz)
@@ -45,7 +47,7 @@ internal object Reflection {
     }
 
     @JvmStatic
-    private fun isType(tested: Class<*>, clz: Class<*>): Boolean {
+    internal fun isType(tested: Class<*>, clz: Class<*>): Boolean {
         if (tested == clz)
             return true
         if (clz.isInterface) {
@@ -162,6 +164,26 @@ internal object Reflection {
         override fun getRawType(): Type = rawType
 
         override fun getOwnerType(): Type = ownerType
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is ParameterizedTypeImpl) return false
+
+            if (ownerType != other.ownerType) return false
+            if (rawType != other.rawType) return false
+            if (!actualTypeArguments.contentEquals(other.actualTypeArguments)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = ownerType.hashCode()
+            result = 31 * result + rawType.hashCode()
+            result = 31 * result + actualTypeArguments.contentHashCode()
+            return result
+        }
+
+
     }
 
     private class WildcardTypeImpl(private val upper: Type, private val lower: Type) : WildcardType,

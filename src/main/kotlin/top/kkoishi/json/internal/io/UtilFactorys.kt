@@ -18,7 +18,7 @@ internal object UtilFactorys {
             val clz = type.type()
             if (clz !is Class<*> || !Reflection.isWrapped(clz))
                 throw IllegalArgumentException()
-            return UtilParsers.getPrimivteParser(clz) as TypeParser<T>
+            return UtilParsers.getPrimitiveParser(clz) as TypeParser<T>
         }
     }
 

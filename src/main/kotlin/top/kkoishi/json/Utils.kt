@@ -54,7 +54,7 @@ class JsonByte(override var byteValue: Byte) : JsonPrimitive() {
 
 class JsonString(override var stringValue: String) : JsonPrimitive() {
     override fun getAsAny(): Any = stringValue
-    override fun getAsString(): String = "\"$stringValue\""
+    override fun getAsString(): String = stringValue
 
     override fun toJsonChar(): JsonChar {
         if (stringValue.isEmpty())

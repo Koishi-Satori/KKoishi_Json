@@ -3,9 +3,12 @@ package top.kkoishi.json.io
 import top.kkoishi.json.JsonElement
 import top.kkoishi.json.JsonObject
 import top.kkoishi.json.JsonString
+import top.kkoishi.json.internal.io.ParserManager
+import top.kkoishi.json.internal.reflect.Allocators
 import top.kkoishi.json.internal.reflect.Reflection
 import top.kkoishi.json.parse.Factorys
 import top.kkoishi.json.reflect.Type
+import top.kkoishi.json.reflect.TypeHelper
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type as JType
@@ -30,7 +33,11 @@ class MapTypeParser<K : Any, V : Any> private constructor(
             throw IllegalStateException()
         }
 
-        internal fun <K : Any, V : Any> ` getInstance`(type: Type<MutableMap<K, V>>, kType: JType, vType: JType) =
+        internal fun <K : Any, V : Any> ` getInstance`(
+            type: Type<MutableMap<K, V>>,
+            kType: JType,
+            vType: JType,
+        ): MapTypeParser<K, V> =
             MapTypeParser(type, kType, vType)
     }
 
@@ -48,25 +55,8 @@ class MapTypeParser<K : Any, V : Any> private constructor(
         return map
     }
 
-    fun getParser(type: JType): TypeParser<*> {
-        if (type is ParameterizedType) {
-            val parameters = type.actualTypeArguments
-            if (parameters.size == 2)
-                return Factorys.getMapTypeFactory().create<Any, Any>(parameters[0], parameters[1])
-
-        }
-        if (type is Class<*>) {
-            return Factorys.getFactoryFromType(type).create(Type(type))
-        }
-        if (type is GenericArrayType) {
-            val cmpType = type.genericComponentType
-            if (cmpType is ParameterizedType) {
-                val tp = Type<Any>(type)
-                return Factorys.getFactoryFromType(tp.rawType()).create(tp)
-            }
-        }
-        throw IllegalStateException()
-    }
+    @Suppress("UNCHECKED_CAST")
+    private fun getParser(type: JType): TypeParser<*> = ParserManager.getParser(type)
 
     override fun toJson(t: MutableMap<K, V>): JsonElement {
         val parameters = (type.type() as ParameterizedType).actualTypeArguments

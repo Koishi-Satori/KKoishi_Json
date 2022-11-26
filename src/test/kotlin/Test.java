@@ -1,19 +1,22 @@
 import top.kkoishi.json.JsonArray;
 import top.kkoishi.json.JsonElement;
 import top.kkoishi.json.JsonString;
+import top.kkoishi.json.annotation.DeserializationIgnored;
 import top.kkoishi.json.annotation.FieldJsonName;
 import top.kkoishi.json.annotation.SerializationIgnored;
 import top.kkoishi.json.io.ArrayTypeParser;
 import top.kkoishi.json.io.BasicJsonWriter;
 import top.kkoishi.json.io.JsonReader;
 import top.kkoishi.json.io.JsonWriter;
-import top.kkoishi.json.io.MapTypeParserFactory;
+import top.kkoishi.json.io.MapTypeParser;
 import top.kkoishi.json.parse.Factorys;
 import top.kkoishi.json.reflect.Type;
+import top.kkoishi.json.reflect.TypeResolver;
 
 import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.System.out;
 
@@ -24,11 +27,21 @@ public final class Test {
         testMapRef();
     }
 
-    private static void testMapRef() throws Exception {
-        // Not passed.
+    private static void testMapRef () throws Exception {
+        final InputStream ins = new FileInputStream("./jo.json");
+        final JsonReader reader = new JsonReader(new InputStreamReader(ins));
+        final TypeResolver<HashMap<String, Node>> resolver = new TypeResolver<HashMap<String, Node>>() {
+        };
+        final MapTypeParser<String, Node> parser = Factorys.getMapTypeFactory().create(resolver);
+        final JsonElement jo = reader.read();
+        final Map<String, Node> map = parser.fromJson(jo);
+        out.println(map.get("114514").context);
+        out.println(map);
+        reader.close();
+        ins.close();
     }
 
-    private static void testArrayRef() throws Exception {
+    private static void testArrayRef () throws Exception {
         final ArrayTypeParser<String[]> parser = Factorys.getArrayTypeFactory().create(new Type<String[]>(String[].class));
         final String[] arr = {"114", "514", "1919810", "test", "fk", "Touhou Project", "Stellaris"};
         final JsonArray ja = parser.toJson(arr);
@@ -63,6 +76,7 @@ public final class Test {
         int a;
 
         @SerializationIgnored
+        @DeserializationIgnored
         boolean flag;
 
         String context;

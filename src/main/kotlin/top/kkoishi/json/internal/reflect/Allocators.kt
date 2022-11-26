@@ -25,6 +25,58 @@ internal object Allocators {
             throw UnsupportedException("This allocator is used for non-instantiable type: $msg")
     }
 
+    fun unsafeAny(tryUnsafe: Boolean): InstanceAllocator<Any> {
+        if (tryUnsafe) {
+            try {
+                val clz = Class.forName("sun.misc.Unsafe")
+                val allocateInstance = clz.getDeclaredMethod("allocateInstance", Class::class.java)
+                val unsafeField = clz.getDeclaredField("theUnsafe")
+                unsafeField.isAccessible = true
+                val unsafe = unsafeField[null]
+                return object : InstanceAllocator<Any> {
+                    override fun allocateInstance(typeofT: Type<Any>): Any {
+                        checkInstantiable(typeofT.rawType())
+                        return allocateInstance(unsafe, typeofT.type())
+                    }
+
+                    override fun allocateInstance(clz: Class<Any>): Any {
+                        checkInstantiable(clz)
+                        return allocateInstance(unsafe, clz)
+                    }
+                }
+            } catch (e: Exception) {
+            }
+        }
+
+        try {
+            val getConstructorId = ObjectStreamClass::class.java.getDeclaredMethod("getConstructorId", Class::class.java)
+            getConstructorId.isAccessible = true
+            val id = getConstructorId(null, Any::class.java) as Int
+            val newInstance = ObjectInputStream::class.java.getDeclaredMethod("newInstance", Class::class.java, Integer.TYPE)
+            newInstance.isAccessible = true
+            return object : InstanceAllocator<Any> {
+                override fun allocateInstance(typeofT: Type<Any>): Any {
+                    with (typeofT.rawType()) {
+                        checkInstantiable(this)
+                        return newInstance(null, this, id)
+                    }
+                }
+
+                override fun allocateInstance(clz: Class<Any>): Any {
+                    checkInstantiable(clz)
+                    return newInstance(null, clz, id)
+                }
+
+            }
+        } catch (e: Exception) {
+        }
+
+        return object : InstanceAllocator<Any> {
+            override fun allocateInstance(typeofT: Type<Any>): Any = Utils.uoe("Unsupported class.")
+            override fun allocateInstance(clz: Class<Any>): Any = Utils.uoe("Unsupported class.")
+        }
+    }
+
     @JvmStatic
     @Suppress("UNCHECKED_CAST")
     fun <T : Any> unsafe(tryUnsafe: Boolean): InstanceAllocator<T> {

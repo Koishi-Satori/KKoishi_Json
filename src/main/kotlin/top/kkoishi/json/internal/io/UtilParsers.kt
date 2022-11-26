@@ -34,17 +34,19 @@ internal object UtilParsers {
         }
     }
 
-    internal fun getPrimivteParser(clz: Class<*>): TypeParser<Any> {
+    @JvmStatic
+    internal fun getPrimitiveParser(clz: Class<*>): TypeParser<Any> {
         return when (clz) {
             Int::class.java, Integer::class.java -> INT
             Long::class.java, java.lang.Long::class.java -> LONG
             Short::class.java, java.lang.Short::class.java -> SHORT
+            String::class.java -> STRING
             // This should not happen.
             else -> throw IllegalArgumentException()
         }
     }
 
-    private abstract class IntergralPrimitiveTypeParser(type: Type<Any>): TypeParser<Any>(type) {
+    private abstract class IntegralPrimitiveTypeParser(type: Type<Any>): TypeParser<Any>(type) {
         abstract fun cast(str: String): Any
 
         abstract fun cast(number: Number): Any
@@ -61,6 +63,7 @@ internal object UtilParsers {
                 if (primitive.isJsonString()) {
                     return cast(primitive.stringValue)
                 }
+                return primitive.getAsAny()
             }
             throw IllegalArgumentException()
         }
@@ -76,20 +79,26 @@ internal object UtilParsers {
     internal val DATE: TypeParser<Date> = DateTypeParser()
 
     @JvmStatic
-    private val INT: TypeParser<Any> = object : IntergralPrimitiveTypeParser(Type<Any>(Int::class.java)) {
+    private val INT: TypeParser<Any> = object : IntegralPrimitiveTypeParser(Type<Any>(Int::class.java)) {
         override fun cast(str: String): Int = Integer.valueOf(str)
         override fun cast(number: Number): Int = number.toInt()
     }
 
     @JvmStatic
-    private val LONG: TypeParser<Any> = object : IntergralPrimitiveTypeParser(Type<Any>(Long::class.java)) {
+    private val LONG: TypeParser<Any> = object : IntegralPrimitiveTypeParser(Type<Any>(Long::class.java)) {
         override fun cast(str: String): Long = java.lang.Long.valueOf(str)
         override fun cast(number: Number): Long = number.toLong()
     }
 
     @JvmStatic
-    private val SHORT: TypeParser<Any> = object : IntergralPrimitiveTypeParser(Type<Any>(Short::class.java)) {
+    private val SHORT: TypeParser<Any> = object : IntegralPrimitiveTypeParser(Type<Any>(Short::class.java)) {
         override fun cast(str: String): Short = java.lang.Short.valueOf(str)
         override fun cast(number: Number): Short = number.toShort()
+    }
+
+    @JvmStatic
+    private val STRING: TypeParser<Any> = object : IntegralPrimitiveTypeParser(Type<Any>(String::class.java)) {
+        override fun cast(str: String): Any = str
+        override fun cast(number: Number): Any = number.toString()
     }
 }

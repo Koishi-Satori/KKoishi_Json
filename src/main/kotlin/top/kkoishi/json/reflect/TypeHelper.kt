@@ -1,11 +1,16 @@
 package top.kkoishi.json.reflect
 
+import top.kkoishi.json.io.TypeParserFactory
 import kotlin.reflect.KClass
 
 object TypeHelper {
     interface TypeToken<T> {
         fun type(): java.lang.reflect.Type
         fun rawType(): Class<in T>
+    }
+
+    interface TypeParserFactoryGetter {
+        fun getFactory(): TypeParserFactory
     }
 
     @JvmStatic
