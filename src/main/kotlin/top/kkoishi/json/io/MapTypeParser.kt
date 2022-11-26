@@ -58,13 +58,12 @@ class MapTypeParser<K : Any, V : Any> private constructor(
     @Suppress("UNCHECKED_CAST")
     private fun getParser(type: JType): TypeParser<*> = ParserManager.getParser(type)
 
+    @Suppress("UNCHECKED_CAST")
     override fun toJson(t: MutableMap<K, V>): JsonElement {
         val parameters = (type.type() as ParameterizedType).actualTypeArguments
         assert(parameters.size == 2)
-        val keyType: Type<K> = Type(parameters[0])
-        val valueType: Type<V> = Type(parameters[1])
-        val keyParser = Factorys.getFactoryFromType(keyType.rawType()).create(keyType)
-        val valueParser = Factorys.getFactoryFromType(valueType.rawType()).create(valueType)
+        val keyParser: TypeParser<K> = getParser(kType) as TypeParser<K>
+        val valueParser: TypeParser<V> = getParser(vType) as TypeParser<V>
         val json = JsonObject()
         for ((k, v) in t) {
             json[keyParser.toJson(k).toString()] = valueParser.toJson(v)
