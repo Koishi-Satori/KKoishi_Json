@@ -3,12 +3,7 @@ package top.kkoishi.json.io
 import top.kkoishi.json.JsonArray
 import top.kkoishi.json.JsonElement
 import top.kkoishi.json.internal.io.ParserManager
-import top.kkoishi.json.internal.reflect.Allocators
-import top.kkoishi.json.internal.reflect.Reflection
-import top.kkoishi.json.parse.Factorys
 import top.kkoishi.json.reflect.Type
-import top.kkoishi.json.reflect.TypeHelper
-import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type as JType
 
@@ -17,10 +12,27 @@ class CollectionTypeParser<T> private constructor(
     private val tType: JType,
 ) :
     TypeParser<Collection<T>>(type) {
+
     init {
         if (tType !is Class<*> || tType !is ParameterizedType) {
             throw IllegalStateException()
         }
+    }
+
+    internal companion object {
+        @JvmStatic
+        internal fun <T : Any> ` getInstance`(
+            type: Type<Collection<T>>,
+            tType: JType,
+        ): CollectionTypeParser<T> =
+            CollectionTypeParser(type, tType)
+    }
+
+    fun fromJson(json: JsonElement, c: Collection<T>): Collection<T> {
+        if (json.isJsonArray()) {
+            return fromJson(json.toJsonArray(), c)
+        }
+        throw IllegalArgumentException()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -44,7 +56,13 @@ class CollectionTypeParser<T> private constructor(
         throw IllegalArgumentException()
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun toJson(t: Collection<T>): JsonArray {
-        TODO("Not yet implemented")
+        val arr = JsonArray()
+        val parser = getParser() as TypeParser<T>
+        for (ele in t) {
+            arr.add(parser.toJson(ele))
+        }
+        return arr
     }
 }

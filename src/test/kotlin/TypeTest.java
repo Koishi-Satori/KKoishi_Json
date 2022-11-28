@@ -17,5 +17,6 @@ public final class TypeTest {
         final var resolve = ((ParameterizedType) resolver.resolve()).getActualTypeArguments()[0];
         out.println(((ParameterizedType) resolve).getActualTypeArguments()[0]);
         out.println(new top.kkoishi.json.reflect.Type<>(int.class));
+        out.println(((ParameterizedType) resolver.resolve()).getRawType());
     }
 }

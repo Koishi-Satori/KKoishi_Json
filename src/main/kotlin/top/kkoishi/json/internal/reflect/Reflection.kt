@@ -153,7 +153,7 @@ internal object Reflection {
 
     @Suppress("UNCHECKED_CAST")
     internal class ParameterizedTypeImpl(
-        private val ownerType: Type,
+        private val ownerType: Type?,
         private val rawType: Type,
         vararg actualTypeArguments: Type,
     ) : ParameterizedType, Serializable {
@@ -163,7 +163,7 @@ internal object Reflection {
 
         override fun getRawType(): Type = rawType
 
-        override fun getOwnerType(): Type = ownerType
+        override fun getOwnerType(): Type? = ownerType
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -177,13 +177,13 @@ internal object Reflection {
         }
 
         override fun hashCode(): Int {
-            var result = ownerType.hashCode()
-            result = 31 * result + rawType.hashCode()
+            var result: Int = if (ownerType != null) {
+                31 * ownerType.hashCode() + rawType.hashCode()
+            } else
+                rawType.hashCode()
             result = 31 * result + actualTypeArguments.contentHashCode()
             return result
         }
-
-
     }
 
     private class WildcardTypeImpl(private val upper: Type, private val lower: Type) : WildcardType,

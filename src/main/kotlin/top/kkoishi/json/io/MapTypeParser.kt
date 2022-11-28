@@ -26,13 +26,7 @@ class MapTypeParser<K : Any, V : Any> private constructor(
     }
 
     internal companion object {
-        internal fun <K : Any, V : Any> ` getInstance`(type: JType): MapTypeParser<K, V> {
-            if (type is ParameterizedType) {
-                val parameters = type.actualTypeArguments
-            }
-            throw IllegalStateException()
-        }
-
+        @JvmStatic
         internal fun <K : Any, V : Any> ` getInstance`(
             type: Type<MutableMap<K, V>>,
             kType: JType,
