@@ -62,7 +62,7 @@ public final class Test {
         oos.close();
         final InputStream ins = new FileInputStream("./clz.json");
         final JsonReader reader = new JsonReader(new InputStreamReader(ins));
-        final Node elem = Factorys.getFactoryFromType(Node.class).create(new Type<>(Node.class)).fromJson(reader.read());
+        final Node elem = Factorys.getFactoryFromClass(Node.class).create(new Type<>(Node.class)).fromJson(reader.read());
         out.println(elem == testNode);
         out.println("qaq: " + elem + "\nqwq: " + testNode);
         out.println(elem.context);

@@ -4,6 +4,8 @@ import top.kkoishi.json.*
 import top.kkoishi.json.io.TypeParser
 import top.kkoishi.json.reflect.Type
 import top.kkoishi.json.reflect.TypeHelper.asType
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.text.DateFormat
 import java.util.*
 import kotlin.reflect.KClass
@@ -32,6 +34,23 @@ internal object UtilParsers {
         }
     }
 
+    internal class IteratorParser<T> : TypeParser<Iterator<T>>(Type(Iterator::class.java)) {
+        override fun fromJson(json: JsonElement): Iterator<T> {
+            if (json.isJsonArray())
+                return fromJsonImpl(json.toJsonArray())
+            throw IllegalArgumentException()
+        }
+
+        private fun fromJsonImpl(json: JsonArray): Iterator<T> {
+            TODO()
+        }
+
+        override fun toJson(t: Iterator<T>): JsonElement {
+            TODO("Not yet implemented")
+        }
+
+    }
+
     @JvmStatic
     internal fun getPrimitiveParser(clz: Class<*>): TypeParser<Any> {
         return when (clz) {
@@ -44,12 +63,13 @@ internal object UtilParsers {
             Boolean::class.java, java.lang.Boolean::class.java -> BOOL
             Char::class.java, Character::class.java -> CHAR
             String::class.java -> STRING
-            // This should not happen.
-            else -> throw IllegalArgumentException()
+            BigInteger::class.java -> BIG_INTEGER
+            // The else option can not be a class out of BigDecimal, this should not happen.
+            else -> BIG_DECIMAL
         }
     }
 
-    private abstract class PrimitiveTypeParser(type: Type<Any>): TypeParser<Any>(type) {
+    private abstract class PrimitiveTypeParser(type: Type<Any>) : TypeParser<Any>(type) {
         abstract fun cast(str: String): Any
         abstract fun cast(number: Number): Any
 
@@ -127,6 +147,7 @@ internal object UtilParsers {
                 return '\u0000'
             return str[0]
         }
+
         override fun cast(number: Number): Char = number.toChar()
     }
 
@@ -140,5 +161,16 @@ internal object UtilParsers {
     private val STRING: TypeParser<Any> = object : PrimitiveTypeParser(Type<Any>(String::class.java)) {
         override fun cast(str: String): Any = str
         override fun cast(number: Number): Any = number.toString()
+    }
+
+    @JvmStatic
+    private val BIG_INTEGER: TypeParser<Any> = object : PrimitiveTypeParser(Type<Any>(BigInteger::class.java)) {
+        override fun cast(str: String): BigInteger = BigInteger(str)
+        override fun cast(number: Number): BigInteger = BigInteger.valueOf(number.toLong())
+    }
+
+    private val BIG_DECIMAL: TypeParser<Any> = object : PrimitiveTypeParser(Type<Any>(BigDecimal::class.java)) {
+        override fun cast(str: String): BigDecimal = BigDecimal(str)
+        override fun cast(number: Number): BigDecimal = BigDecimal.valueOf(number.toDouble())
     }
 }

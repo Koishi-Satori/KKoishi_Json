@@ -3,7 +3,7 @@ package top.kkoishi.json.io
 import top.kkoishi.json.JsonElement
 import top.kkoishi.json.reflect.Type
 
-abstract class TypeParser<T>(protected val type:Type<T>) {
+abstract class TypeParser<T>(protected val type: Type<T>) {
     /**
      * Deserialize the json element to actual instance.
      *

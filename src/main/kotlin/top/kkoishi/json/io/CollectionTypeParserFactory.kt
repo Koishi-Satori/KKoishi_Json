@@ -16,8 +16,12 @@ class CollectionTypeParserFactory private constructor() {
 
     @JvmOverloads
     @Suppress("UNCHECKED_CAST")
-    fun <T> create(tType: JType, rawType: JType = Collection::class.java): CollectionTypeParser<T> where T : Any {
-        val key = Reflection.ParameterizedTypeImpl(null, rawType, tType)
+    fun <T> create(
+        tType: JType,
+        rawType: JType = Collection::class.java,
+        ownerType: JType? = null,
+    ): CollectionTypeParser<T> where T : Any {
+        val key = Reflection.ParameterizedTypeImpl(ownerType, rawType, tType)
         var inst: CollectionTypeParser<T>? = instances[key] as CollectionTypeParser<T>?
         if (inst == null) {
             inst = CollectionTypeParser.` getInstance`(Type(Collection::class.java), tType)
@@ -29,6 +33,6 @@ class CollectionTypeParserFactory private constructor() {
     fun <T> create(typeResolver: TypeResolver<out Collection<T>>): CollectionTypeParser<T> where T : Any {
         val parameterizedType = typeResolver.resolve() as ParameterizedType
         val types = parameterizedType.actualTypeArguments
-        return create(types[0], parameterizedType.rawType)
+        return create(types[0], parameterizedType.rawType, parameterizedType.ownerType)
     }
 }

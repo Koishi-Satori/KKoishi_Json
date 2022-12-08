@@ -9,6 +9,7 @@ import top.kkoishi.json.reflect.TypeHelper
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
+import top.kkoishi.json.reflect.Type as KType
 
 internal object ParserManager {
     @Suppress("UNCHECKED_CAST")
@@ -26,25 +27,32 @@ internal object ParserManager {
         } else if (type is Class<*>) {
             if (Reflection.checkJsonPrimitive(type))
                 return jsonPrimitiveParser(type)
-            if (Reflection.isType(type, TypeHelper.TypeParserFactoryGetter::class.java)) {
-                val getter = type.getDeclaredMethod("getTypeParser")
+            fun getFromType() = Factorys.getFactoryFromClass(type).create(KType(type))
+
+            val getter = Reflection.checkFactoryGetter(type)
+            if (getter != null) {
                 getter.isAccessible = true
-                val parser =
-                    getter(Allocators.unsafeAny(true).allocateInstance(type as Class<Any>)) as TypeParserFactory
-                Factorys.addSpec(type, parser)
-                return parser.create(top.kkoishi.json.reflect.Type(type))
+                if (0 != getter.parameterCount)
+                    return Factorys.getFactoryFromClass(type).create(KType(type))
+                val factory: TypeParserFactory =
+                    getter(if (Reflection.isStatic(getter)) null else Allocators.unsafeAny(true)
+                        .allocateInstance(type as Class<Any>)) as TypeParserFactory?
+                        ?: return getFromType()
+                Factorys.addType(type, factory)
+                return factory.create(KType(type))
             }
-            return Factorys.getFactoryFromType(type).create(top.kkoishi.json.reflect.Type(type))
+            return Factorys.getFactoryFromClass(type).create(KType(type))
         } else if (type is GenericArrayType) {
             // TODO: may have bugs.
             val cmpType = type.genericComponentType
             if (cmpType is ParameterizedType) {
-                val tp = top.kkoishi.json.reflect.Type<Any>(type)
-                return Factorys.getFactoryFromType(tp.rawType()).create(tp)
+                val tp = KType<Any>(type)
+                return Factorys.getFactoryFromClass(tp.rawType()).create(tp)
             }
         }
         throw IllegalStateException()
     }
 
+    @JvmStatic
     private fun jsonPrimitiveParser(clz: Class<*>): TypeParser<Any> = UtilParsers.getPrimitiveParser(clz)
 }

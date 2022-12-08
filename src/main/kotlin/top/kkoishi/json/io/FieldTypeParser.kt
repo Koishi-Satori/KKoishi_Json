@@ -22,6 +22,7 @@ import top.kkoishi.json.internal.Utils.getInt
 import top.kkoishi.json.internal.Utils.getLong
 import top.kkoishi.json.internal.Utils.getShort
 import top.kkoishi.json.internal.reflect.Allocators
+import top.kkoishi.json.internal.reflect.Reflection
 import top.kkoishi.json.reflect.Type
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -269,7 +270,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
             }
             JsonElement.PRIMITIVE -> json.toJsonPrimitive().toPrimitive(clz)
             else -> {
-                val factory = Factorys.getFactoryFromType(clz)
+                val factory = Factorys.getFactoryFromClass(clz)
                 if (safe) {
                     if (factory is FieldTypeParserFactory)
                         return factory.fieldParser().create(Type(clz)).safe(tryUnsafe).fromJson(json)
@@ -292,7 +293,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
                 elements.addLast(wrap(ArrayRef.get(v, index)))
             return JsonArray(elements)
         }
-        return Factorys.getFactoryFromType(clz).create(Type(clz)).toJson(v)
+        return Factorys.getFactoryFromClass(clz).create(Type(clz)).toJson(v)
     }
 
     private fun wrapJsonPrimitive(v: Any): JsonPrimitive = JsonPrimitive.createActual(v)
@@ -301,7 +302,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
         val declaredFields = type.rawType().declaredFields
         val fields: ArrayDeque<FieldData> = ArrayDeque(declaredFields.size)
         for (field in declaredFields)
-            if (!Modifier.isStatic(field.modifiers))
+            if (!Reflection.isStatic(field))
                 fields.addLast(serializeField(field))
         return fields
     }
@@ -312,7 +313,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
         val declaredFields = type.rawType().declaredFields
         val fields: ArrayDeque<FieldData> = ArrayDeque(declaredFields.size)
         for (field in declaredFields)
-            if (!Modifier.isStatic(field.modifiers))
+            if (!Reflection.isStatic(field))
                 fields.addLast(deserializeField(field, o))
         return fields
     }

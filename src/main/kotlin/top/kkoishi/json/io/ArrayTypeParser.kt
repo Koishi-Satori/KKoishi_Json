@@ -54,7 +54,7 @@ class ArrayTypeParser<T> private constructor(type: Type<T>) : TypeParser<T>(type
             }
             JsonElement.PRIMITIVE -> json.toJsonPrimitive().getAsAny()
             else ->
-                Factorys.getFactoryFromType(clz).create(Type(clz)).fromJson(json)
+                Factorys.getFactoryFromClass(clz).create(Type(clz)).fromJson(json)
         }
     }
 
@@ -74,7 +74,7 @@ class ArrayTypeParser<T> private constructor(type: Type<T>) : TypeParser<T>(type
             return Factorys.getArrayTypeFactory().create<Any>(Type(clz)).toJson(v)
         if (checkPrimitive(v))
             return JsonPrimitive.createActual(v)
-        return Factorys.getFactoryFromType(clz).create(Type(clz)).toJson(v)
+        return Factorys.getFactoryFromClass(clz).create(Type(clz)).toJson(v)
     }
 
 

@@ -3,6 +3,7 @@ package top.kkoishi.json
 import top.kkoishi.json.annotation.DeserializationIgnored
 import top.kkoishi.json.annotation.FieldJsonName
 import top.kkoishi.json.annotation.SerializationIgnored
+import top.kkoishi.json.internal.reflect.Reflection
 import top.kkoishi.json.io.FieldTypeParser
 import top.kkoishi.json.io.FieldTypeParserFactory
 import top.kkoishi.json.reflect.Type
@@ -52,7 +53,7 @@ abstract class AbstractFieldTypeParser<T : Any>(type: Type<T>) : FieldTypeParser
         if (getterName.isNotEmpty()) {
             val getter = checkGetter(getterName)
             if (getter != null)
-                return getter.invoke(if (Modifier.isStatic(getter.modifiers)) null else inst)
+                return getter.invoke(if (Reflection.isStatic(getter)) null else inst)
         }
         val clz = field.type
         if (clz.isPrimitive)
