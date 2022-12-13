@@ -292,7 +292,7 @@ internal object Reflection {
                 return raw as Class<*>
             }
             is GenericArrayType -> {
-                return java.lang.reflect.Array.newInstance(getRawType(type.genericComponentType), 0).javaClass
+                return Array.newInstance(getRawType(type.genericComponentType), 0).javaClass
             }
             is TypeVariable<*> -> return Any::class.java
             is WildcardType -> {

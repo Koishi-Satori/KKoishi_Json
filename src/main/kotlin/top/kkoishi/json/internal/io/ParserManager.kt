@@ -5,10 +5,7 @@ import top.kkoishi.json.internal.reflect.Reflection
 import top.kkoishi.json.io.TypeParser
 import top.kkoishi.json.io.TypeParserFactory
 import top.kkoishi.json.parse.Factorys
-import top.kkoishi.json.reflect.TypeHelper
-import java.lang.reflect.GenericArrayType
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
+import java.lang.reflect.*
 import top.kkoishi.json.reflect.Type as KType
 
 internal object ParserManager {
@@ -16,14 +13,14 @@ internal object ParserManager {
     fun getParser(type: Type): TypeParser<*> {
         if (type is ParameterizedType) {
             val parameters = type.actualTypeArguments
-            if (parameters.size == 2)
+            val raw = Reflection.getRawType(type.rawType)
+            if (parameters.size == 2 && raw == MutableMap::class.java)
                 return Factorys.getMapTypeFactory().create<Any, Any>(parameters[0], parameters[1])
-            if (parameters.size == 1) {
+            if (parameters.size == 1 && raw == Collection::class.java)
                 return Factorys.getCollectionTypeFactory().create<Any>(parameters[0])
-            }
-            val owner = type.ownerType
-            if (owner is Class<*>)
-                return getParser(type.ownerType)
+
+            if (type != Any::class.java)
+                return getParser(raw)
         } else if (type is Class<*>) {
             if (Reflection.checkJsonPrimitive(type))
                 return jsonPrimitiveParser(type)

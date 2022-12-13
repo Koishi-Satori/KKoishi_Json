@@ -13,7 +13,7 @@ import kotlin.reflect.KClass
 internal object UtilParsers {
     private const val DATEFORMAT_DEFAULT = 2
 
-    internal class DateTypeParser : TypeParser<Date>(Date::class.java.asType()) {
+    internal open class DateTypeParser : TypeParser<Date>(Date::class.java.asType()) {
         override fun fromJson(json: JsonElement): Date =
             fromJson(json, DATEFORMAT_DEFAULT, DATEFORMAT_DEFAULT, Locale.getDefault(Locale.Category.FORMAT))
 
@@ -32,23 +32,6 @@ internal object UtilParsers {
         internal fun toJson(t: Date, dateStyle: Int, timeStyle: Int, aLocale: Locale): JsonElement {
             return JsonString(DateFormat.getDateTimeInstance(dateStyle, timeStyle, aLocale).format(t))
         }
-    }
-
-    internal class IteratorParser<T> : TypeParser<Iterator<T>>(Type(Iterator::class.java)) {
-        override fun fromJson(json: JsonElement): Iterator<T> {
-            if (json.isJsonArray())
-                return fromJsonImpl(json.toJsonArray())
-            throw IllegalArgumentException()
-        }
-
-        private fun fromJsonImpl(json: JsonArray): Iterator<T> {
-            TODO()
-        }
-
-        override fun toJson(t: Iterator<T>): JsonElement {
-            TODO("Not yet implemented")
-        }
-
     }
 
     @JvmStatic

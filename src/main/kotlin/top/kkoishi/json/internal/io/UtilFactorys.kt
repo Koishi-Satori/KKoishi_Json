@@ -16,7 +16,7 @@ internal object UtilFactorys {
     val PRIMITIVE: TypeParserFactory = object : TypeParserFactory {
         override fun <T : Any> create(type: Type<T>): TypeParser<T> {
             val clz = type.type()
-            if (clz !is Class<*> || !Reflection.isWrapped(clz))
+            if (clz !is Class<*>)
                 throw IllegalArgumentException()
             return UtilParsers.getPrimitiveParser(clz) as TypeParser<T>
         }

@@ -25,6 +25,7 @@ internal object Allocators {
             throw UnsupportedException("This allocator is used for non-instantiable type: $msg")
     }
 
+    @JvmStatic
     fun unsafeAny(tryUnsafe: Boolean): InstanceAllocator<Any> {
         if (tryUnsafe) {
             try {

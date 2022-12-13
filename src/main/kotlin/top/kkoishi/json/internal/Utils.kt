@@ -1,11 +1,17 @@
 package top.kkoishi.json.internal
 
 import top.kkoishi.json.exceptions.UnsupportedException
+import top.kkoishi.json.io.TypeParserFactory
 import java.lang.reflect.Field
 import java.lang.reflect.Method
+import java.lang.reflect.Type
 import kotlin.jvm.Throws
 
 internal object Utils {
+    internal fun KKoishiJsonInit(): MutableMap<Type, TypeParserFactory> {
+        TODO()
+    }
+
     @JvmStatic
     private fun accessUnsafe(): Any? {
         try {
