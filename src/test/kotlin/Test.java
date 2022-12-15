@@ -1,6 +1,7 @@
 import top.kkoishi.json.JsonArray;
 import top.kkoishi.json.JsonElement;
 import top.kkoishi.json.JsonString;
+import top.kkoishi.json.KKoishiJson;
 import top.kkoishi.json.annotation.DeserializationIgnored;
 import top.kkoishi.json.annotation.FieldJsonName;
 import top.kkoishi.json.annotation.SerializationIgnored;
@@ -24,7 +25,20 @@ public final class Test {
     public static void main (String[] args) throws Exception {
         //testRef();
         //testArrayRef();
-        testMapRef();
+        //testMapRef();
+        test();
+    }
+
+    private static void test () throws Exception {
+        // test Node.class
+        final KKoishiJson test = new KKoishiJson();
+        final OutputStream oos = new FileOutputStream("./clz.json");
+        final JsonWriter writer = test.writer(new OutputStreamWriter(oos));
+        final Node testNode = new Node(114, true, "ee", new Node(514, false, "aa", null));
+        writer.write(test.toJson(Node.class, testNode));
+        writer.flush();
+        writer.close();
+        oos.close();
     }
 
     private static void testMapRef () throws Exception {

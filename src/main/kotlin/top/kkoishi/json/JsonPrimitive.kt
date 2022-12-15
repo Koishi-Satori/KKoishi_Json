@@ -35,7 +35,7 @@ abstract class JsonPrimitive : JsonElement(PRIMITIVE) {
                 java.lang.Float.TYPE, java.lang.Float::class.java -> JsonFloat(v as Float)
                 java.lang.Double.TYPE, java.lang.Double::class.java -> JsonDouble(v as Double)
                 java.lang.Boolean.TYPE, java.lang.Boolean::class.java -> JsonBool(v as Boolean)
-                String::class.java -> JsonString(v.toString())
+                String::class.java -> JsonString("\"$v\"")
                 else -> {
                     if (v is BigInteger)
                         JsonBigInteger(v)

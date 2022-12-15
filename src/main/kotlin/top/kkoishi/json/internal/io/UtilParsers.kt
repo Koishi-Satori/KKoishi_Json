@@ -152,6 +152,7 @@ internal object UtilParsers {
         override fun cast(number: Number): BigInteger = BigInteger.valueOf(number.toLong())
     }
 
+    @JvmStatic
     private val BIG_DECIMAL: TypeParser<Any> = object : PrimitiveTypeParser(Type<Any>(BigDecimal::class.java)) {
         override fun cast(str: String): BigDecimal = BigDecimal(str)
         override fun cast(number: Number): BigDecimal = BigDecimal.valueOf(number.toDouble())

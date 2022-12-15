@@ -1,15 +1,20 @@
 package top.kkoishi.json.internal
 
+import top.kkoishi.json.KKoishiJson
 import top.kkoishi.json.exceptions.UnsupportedException
+import top.kkoishi.json.internal.InternalParserFactory.DateParser
+import top.kkoishi.json.internal.InternalParserFactory.getFactory
 import top.kkoishi.json.io.TypeParserFactory
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Type
+import java.util.*
 import kotlin.jvm.Throws
 
 internal object Utils {
-    internal fun KKoishiJsonInit(): MutableMap<Type, TypeParserFactory> {
-        TODO()
+    internal fun KKoishiJsonInit(inst: KKoishiJson): MutableMap<Type, TypeParserFactory> {
+        // TODO: init some basic classes.
+        return mutableMapOf(getFactory(Date::class.java, DateParser(inst)))
     }
 
     @JvmStatic
