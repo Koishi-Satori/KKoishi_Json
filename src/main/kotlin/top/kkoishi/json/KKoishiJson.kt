@@ -3,6 +3,7 @@ package top.kkoishi.json
 import top.kkoishi.json.annotation.DeserializationIgnored
 import top.kkoishi.json.annotation.FieldJsonName
 import top.kkoishi.json.annotation.SerializationIgnored
+import top.kkoishi.json.exceptions.UnsupportedException
 import top.kkoishi.json.internal.InternalParserFactory
 import top.kkoishi.json.internal.Utils.KKoishiJsonInit
 import top.kkoishi.json.internal.io.UtilFactorys
@@ -34,7 +35,7 @@ class KKoishiJson {
     private lateinit var fieldParserFactory: InternalFieldParserFactory
 
     @Suppress("RemoveRedundantSpreadOperator")
-    constructor(): this(*arrayOf())
+    constructor() : this(*arrayOf())
 
     constructor(vararg initFactories: Pair<JType, TypeParserFactory>) : this(DEFAULT_DATE_STYLE,
         DEFAULT_TIME_STYLE,
@@ -131,15 +132,70 @@ class KKoishiJson {
         }
     }
 
-    fun <T> fromJson(typeResolver: TypeResolver<T>, json: JsonElement): T? where T : Any {
+    @Suppress("UNCHECKED_CAST")
+    fun <T> toJson(typeResolver: TypeResolver<T?>, instance: T?): JsonElement where T : Any {
+        if (instance == null)
+            return JsonNull()
+        val type = typeResolver.resolve()
+        if (type !is ParameterizedType)
+            throw IllegalStateException()
+
+        val factory = getFactory(type)
+        if (factory != null) {
+            val tp = Type<T>(type)
+            return factory.create(tp).toJson(instance)
+        }
+
+        val parser: TypeParser<Any> = (getParser(type) ?: throw UnsupportedException()) as TypeParser<Any>
+        return parser.toJson(instance)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T> fromJson(typeResolver: TypeResolver<T?>, json: JsonElement): T? where T : Any {
         if (json.isJsonNull())
             return null
-        val factory = getFactory(typeResolver)
+        val type = typeResolver.resolve()
+        if (type !is ParameterizedType)
+            throw IllegalStateException()
+        val parameters = type.actualTypeArguments
+        val raw: Class<T> = Reflection.getRawType(type.rawType) as Class<T>
+
+        val factory = getFactory(type)
         if (factory != null) {
-            val tp = Type<T>(typeResolver.resolve())
+            val tp = Type<T>(type)
             return factory.create(tp).fromJson(json)
         }
-        TODO()
+
+        val parser = getParser(type) ?: throw UnsupportedException()
+        val result = parser.fromJson(json)
+        if (parser is CollectionTypeParser<*>) {
+            val collection = Allocators.unsafe<T>(useUnsafe).allocateInstance(raw)
+            val add: Method
+            try {
+                add = Reflection.getMethod(collection.javaClass, "add", Any::class.java)
+            } catch (e: Exception) {
+                throw IllegalStateException(e)
+            }
+            val resource = result as Collection<*>
+            for (e in resource)
+                add(collection, e)
+            return collection
+        }
+
+        if (parser is MapTypeParser<*, *>) {
+            val map = Allocators.unsafe<T>(useUnsafe).allocateInstance(raw)
+            val put: Method
+            try {
+                put = Reflection.getMethod(map.javaClass, "put", Any::class.java, Any::class.java)
+            } catch (e: Exception) {
+                throw IllegalStateException(e)
+            }
+            val resource = result as Map<*, *>
+            for ((k, v) in resource)
+                put(map, k, v)
+            return map
+        }
+        return result as T
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -191,9 +247,9 @@ class KKoishiJson {
         if (type is ParameterizedType) {
             val parameters = type.actualTypeArguments
             val raw = Reflection.getRawType(type.rawType)
-            if (parameters.size == 2 && raw == MutableMap::class.java)
+            if (parameters.size == 2 && Reflection.isMap(raw))
                 return Factorys.getMapTypeFactory().create<Any, Any>(parameters[0], parameters[1])
-            if (parameters.size == 1 && raw == Collection::class.java)
+            if (parameters.size == 1 && Reflection.isCollection(raw))
                 return Factorys.getCollectionTypeFactory().create<Any>(parameters[0])
 
             if (type != Any::class.java)
@@ -236,7 +292,7 @@ class KKoishiJson {
     private fun getIfNotContainsFromClass(type: Class<*>): TypeParserFactory {
         if (type.isArray)
             return Factorys.getArrayTypeFactory()
-        else if (Reflection.isMapType(type) || Reflection.isCollection(type))
+        else if (Reflection.isMap(type) || Reflection.isCollection(type))
             throw IllegalArgumentException()
         else if (Reflection.checkJsonPrimitive(type))
             return UtilFactorys.PRIMITIVE
@@ -244,18 +300,36 @@ class KKoishiJson {
             return getFieldTypeFactory()
     }
 
-    private fun <TYPE> getFactory(typeResolver: TypeResolver<TYPE>): TypeParserFactory? {
-        val parameterizedType = typeResolver.resolve() as ParameterizedType
+    private fun getFactory(parameterizedType: ParameterizedType): TypeParserFactory? {
         val arguments = parameterizedType.actualTypeArguments
         val key = Reflection.ParameterizedTypeImpl(parameterizedType.ownerType, parameterizedType.rawType, *arguments)
         if (stored.containsKey(key)) {
             return stored[key]!!
         }
         val rawType = Reflection.getRawType(key.rawType)
-        if ((arguments.size == 2 && rawType == MutableMap::class.java) ||
-            (arguments.size == 1 && rawType == Collection::class.java)
+        if ((arguments.size == 2 && Reflection.isMap(rawType)) ||
+            (arguments.size == 1 && Reflection.isCollection(rawType))
         )
             return null
         return getIfNotContainsFromClass(rawType)
+    }
+
+    private fun <TYPE> getFactory(typeResolver: TypeResolver<TYPE>): TypeParserFactory? {
+        val parameterizedType = typeResolver.resolve() as ParameterizedType
+        return getFactory(parameterizedType)
+    }
+
+    private fun isMap(type: ParameterizedType): Boolean {
+        val raw = Reflection.getRawType(type.rawType)
+        if (Reflection.isMap(raw) && type.actualTypeArguments.size == 2)
+            return true
+        return false
+    }
+
+    private fun isCollection(type: ParameterizedType): Boolean {
+        val raw = Reflection.getRawType(type.rawType)
+        if (Reflection.isCollection(raw) && type.actualTypeArguments.size == 1)
+            return true
+        return false
     }
 }

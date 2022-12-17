@@ -17,6 +17,7 @@ import top.kkoishi.json.reflect.TypeResolver;
 import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static java.lang.System.out;
@@ -32,13 +33,32 @@ public final class Test {
     private static void test () throws Exception {
         // test Node.class
         final KKoishiJson test = new KKoishiJson();
-        final OutputStream oos = new FileOutputStream("./clz.json");
-        final JsonWriter writer = test.writer(new OutputStreamWriter(oos));
+        OutputStream oos = new FileOutputStream("./clz.json");
+        JsonWriter writer = test.writer(new OutputStreamWriter(oos));
         final Node testNode = new Node(114, true, "ee", new Node(514, false, "aa", null));
         writer.write(test.toJson(Node.class, testNode));
         writer.flush();
         writer.close();
         oos.close();
+
+        // test array.
+        InputStream ins = new FileInputStream("./arr.json");
+        JsonReader reader = test.reader(new InputStreamReader(ins));
+        JsonElement ele = reader.read();
+        String[] arr = test.fromJson(String[].class, ele);
+        out.println(Arrays.toString(arr));
+        reader.close();
+        ins.close();
+
+        // test map.
+        ins = new FileInputStream("./jo.json");
+        reader = test.reader(new InputStreamReader(ins));
+        ele = reader.read();
+        final LinkedHashMap<String, Node> map = test.fromJson(new TypeResolver<LinkedHashMap<String, Node>>() {
+        }, ele);
+        out.println(map);
+        reader.close();
+        ins.close();
     }
 
     private static void testMapRef () throws Exception {

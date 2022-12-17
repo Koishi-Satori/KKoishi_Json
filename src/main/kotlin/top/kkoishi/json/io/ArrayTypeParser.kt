@@ -44,7 +44,7 @@ class ArrayTypeParser<T> private constructor(type: Type<T>) : TypeParser<T>(type
         return Array(arr.size()) { unwrap(arr[it], arr[it].javaClass) }
     }
 
-    private fun unwrap(json: JsonElement, clz: Class<*>): Any? {
+    private fun <E> unwrap(json: JsonElement, clz: Class<E>): Any? where E : Any{
         return when (json.typeTag) {
             JsonElement.NULL -> null
             JsonElement.ARRAY -> {

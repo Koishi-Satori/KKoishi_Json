@@ -302,7 +302,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
         val declaredFields = type.rawType().declaredFields
         val fields: ArrayDeque<FieldData> = ArrayDeque(declaredFields.size)
         for (field in declaredFields)
-            if (!Reflection.isStatic(field))
+            if (!(Reflection.isStatic(field) || Reflection.isTransient(field)))
                 fields.addLast(serializeField(field))
         return fields
     }
@@ -313,7 +313,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
         val declaredFields = type.rawType().declaredFields
         val fields: ArrayDeque<FieldData> = ArrayDeque(declaredFields.size)
         for (field in declaredFields)
-            if (!Reflection.isStatic(field))
+            if (!(Reflection.isStatic(field) || Reflection.isTransient(field)))
                 fields.addLast(deserializeField(field, o))
         return fields
     }

@@ -14,9 +14,9 @@ internal object ParserManager {
         if (type is ParameterizedType) {
             val parameters = type.actualTypeArguments
             val raw = Reflection.getRawType(type.rawType)
-            if (parameters.size == 2 && raw == MutableMap::class.java)
+            if (parameters.size == 2 && Reflection.isMap(raw))
                 return Factorys.getMapTypeFactory().create<Any, Any>(parameters[0], parameters[1])
-            if (parameters.size == 1 && raw == Collection::class.java)
+            if (parameters.size == 1 && Reflection.isCollection(raw))
                 return Factorys.getCollectionTypeFactory().create<Any>(parameters[0])
 
             if (type != Any::class.java)

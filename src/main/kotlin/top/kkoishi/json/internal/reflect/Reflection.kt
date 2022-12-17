@@ -2,16 +2,21 @@ package top.kkoishi.json.internal.reflect
 
 import top.kkoishi.json.annotation.FactoryGetter
 import top.kkoishi.json.reflect.TypeHelper
-import top.kkoishi.json.reflect.Type as KType
 import java.io.Serializable
 import java.lang.reflect.*
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.math.BigInteger
-import kotlin.text.StringBuilder
+import java.util.*
+import java.util.stream.Collectors
+import kotlin.collections.ArrayDeque
+import top.kkoishi.json.reflect.Type as KType
 import kotlin.Array as KArray
 
 internal object Reflection {
+    @JvmStatic
+    internal fun isTransient(field: Field): Boolean = Modifier.isTransient(field.modifiers)
+
     /**
      * Parse the jvm name of a method and return the method's name and the classes of
      * its parameters.
@@ -131,6 +136,27 @@ internal object Reflection {
         return null
     }
 
+    private fun methodToString(clz: Class<*>, name: String, argTypes: kotlin.Array<out Class<*>>): String? {
+        return (clz.name + '.' + name +
+                if (argTypes.isEmpty()) "()" else Arrays.stream(argTypes)
+                    .map { c: Class<*>? -> if (c == null) "null" else c.name }
+                    .collect(Collectors.joining(",", "(", ")")))
+    }
+
+    internal fun getMethod(clz: Class<*>, methodName: String, vararg parameterClasses: Class<*>): Method {
+        try {
+            return clz.getDeclaredMethod(methodName, *parameterClasses)
+        } catch (noMethod: NoSuchMethodException) {
+            if (clz == Any::class.java)
+                throw NoSuchMethodException(methodToString(clz, methodName, parameterClasses))
+            val superMethod = getMethodRecruit(clz.superclass, methodName, *parameterClasses)
+            if (superMethod != null)
+                return superMethod
+        } catch (security: SecurityException) {
+        }
+        throw NoSuchMethodException(methodToString(clz, methodName, parameterClasses))
+    }
+
     @JvmStatic
     private fun getMethodRecruit(clz: Class<*>, methodName: String, vararg parameterClasses: Class<*>): Method? {
         try {
@@ -196,10 +222,10 @@ internal object Reflection {
     }
 
     @JvmStatic
-    internal fun isMapType(type: KType<*>): Boolean = isType(type, Map::class.java)
+    internal fun isMap(type: KType<*>): Boolean = isType(type, Map::class.java)
 
     @JvmStatic
-    internal fun isMapType(type: Class<*>): Boolean = isType(type, Map::class.java)
+    internal fun isMap(type: Class<*>): Boolean = isType(type, Map::class.java)
 
     internal fun isCollection(type: Class<*>): Boolean = isType(type, Collection::class.java)
 

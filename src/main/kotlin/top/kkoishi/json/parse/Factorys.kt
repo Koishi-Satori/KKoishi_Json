@@ -44,7 +44,7 @@ object Factorys {
     private fun getIfNotContainsFromClass(type: Class<*>): TypeParserFactory {
         if (type.isArray)
             return getArrayTypeFactory()
-        else if (Reflection.isMapType(type) || Reflection.isCollection(type))
+        else if (Reflection.isMap(type) || Reflection.isCollection(type))
             throw IllegalArgumentException()
         else if (Reflection.checkJsonPrimitive(type))
             return UtilFactorys.PRIMITIVE
