@@ -14,6 +14,9 @@ import top.kkoishi.json.reflect.Type as KType
 import kotlin.Array as KArray
 
 internal object Reflection {
+    const val ACC_PUBLIC = 0x0001
+    const val ACC_PRIVATE = 0x0002
+
     @JvmStatic
     internal fun isTransient(field: Field): Boolean = Modifier.isTransient(field.modifiers)
 
@@ -136,7 +139,7 @@ internal object Reflection {
         return null
     }
 
-    private fun methodToString(clz: Class<*>, name: String, argTypes: kotlin.Array<out Class<*>>): String? {
+    private fun methodToString(clz: Class<*>, name: String, argTypes: kotlin.Array<out Class<*>>): String {
         return (clz.name + '.' + name +
                 if (argTypes.isEmpty()) "()" else Arrays.stream(argTypes)
                     .map { c: Class<*>? -> if (c == null) "null" else c.name }

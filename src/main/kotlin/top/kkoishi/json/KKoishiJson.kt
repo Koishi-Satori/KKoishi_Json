@@ -30,9 +30,11 @@ class KKoishiJson {
     val timeStyle: Int
     val locale: Locale
     val useUnsafe: Boolean
+    val ignoreNull: Boolean
 
     private lateinit var stored: MutableMap<JType, TypeParserFactory>
     private lateinit var fieldParserFactory: InternalFieldParserFactory
+    private var ignoredModifiers: Int = 0x0000
 
     @Suppress("RemoveRedundantSpreadOperator")
     constructor() : this(*arrayOf())
@@ -41,6 +43,7 @@ class KKoishiJson {
         DEFAULT_TIME_STYLE,
         DEFAULT_LOCALE,
         DEFAULT_USE_UNSAFE,
+        DEFAULT_IGNORE_NULL,
         *initFactories)
 
     constructor(
@@ -48,12 +51,14 @@ class KKoishiJson {
         timeStyle: Int,
         locale: Locale,
         useUnsafe: Boolean,
+        ignoreNull: Boolean,
         vararg initFactories: Pair<JType, TypeParserFactory>,
     ) {
         this.dateStyle = dateStyle
         this.timeStyle = timeStyle
         this.locale = locale
         this.useUnsafe = useUnsafe
+        this.ignoreNull = ignoreNull
 
         for ((tp, factory) in initFactories) {
             stored[tp] = factory
@@ -70,6 +75,7 @@ class KKoishiJson {
         @JvmStatic
         private val DEFAULT_LOCALE = Locale.getDefault()
         private const val DEFAULT_USE_UNSAFE = true
+        private const val DEFAULT_IGNORE_NULL = false
 
         private class InternalFieldParserFactory(override val instance: KKoishiJson) : TypeParserFactory,
             InternalParserFactory.Conditional {
@@ -228,6 +234,16 @@ class KKoishiJson {
         return parser.toJson(instance)
     }
 
+    fun toJsonString(element: JsonElement): String {
+        if (element.isJsonNull())
+            return if (ignoreNull)
+                ""
+            else "null"
+        val buffer = StringBuilder()
+        writeJson(element, buffer)
+        return buffer.toString()
+    }
+
     @JvmOverloads
     fun reader(
         reader: Reader,
@@ -238,6 +254,68 @@ class KKoishiJson {
     @JvmOverloads
     fun writer(writer: Writer, lineSeparator: String = "\n"): JsonWriter {
         return BasicJsonWriter(writer, lineSeparator)
+    }
+
+    private fun writeJson(element: JsonElement, buffer: StringBuilder) {
+        if (element.isJsonPrimitive())
+            buffer.append(element.toString())
+        else if (element.isJsonArray())
+            writeJsonArray(element.toJsonArray(), buffer)
+        else
+            writeJsonObject(element.toJsonObject(), buffer)
+    }
+
+    private fun writeJsonArray(arr: JsonArray, buffer: StringBuilder) {
+        buffer.append('[')
+        val rest = arr.iterator()
+        if (rest.hasNext())
+            while (true) {
+                val element = rest.next()
+                if (element.isJsonNull()) {
+                    if (!rest.hasNext()) {
+                        if (ignoreNull)
+                            break
+                        else
+                            buffer.append("null")
+                    } else {
+                        if (!ignoreNull)
+                            buffer.append("null, ")
+                    }
+                } else {
+                    writeJson(element, buffer)
+                    if (!rest.hasNext())
+                        break
+                    buffer.append(", ")
+                }
+            }
+        buffer.append(']')
+    }
+
+    private fun writeJsonObject(obj: JsonObject, buffer: StringBuilder) {
+        buffer.append('{')
+        val rest = obj.iterator()
+        if (rest.hasNext())
+            while (true) {
+                val (k, v) = rest.next()
+                if (v.isJsonNull()) {
+                    if (!rest.hasNext()) {
+                        if (ignoreNull)
+                            break
+                        else
+                            buffer.append('"').append(k).append("\": ").append("null")
+                    } else {
+                        if (!ignoreNull)
+                            buffer.append('"').append(k).append("\": ").append("null, ")
+                    }
+                } else {
+                    buffer.append('"').append(k).append("\": ")
+                    writeJson(v, buffer)
+                    if (!rest.hasNext())
+                        break
+                    buffer.append(", ")
+                }
+            }
+        buffer.append('}')
     }
 
     private fun getFieldTypeFactory(): TypeParserFactory = fieldParserFactory
@@ -331,5 +409,9 @@ class KKoishiJson {
         if (Reflection.isCollection(raw) && type.actualTypeArguments.size == 1)
             return true
         return false
+    }
+
+    override fun toString(): String {
+        return "KKoishiJson"
     }
 }

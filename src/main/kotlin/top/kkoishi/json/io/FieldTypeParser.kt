@@ -104,10 +104,11 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
             if (field.getAnnotation(DeserializationIgnored::class.java) != null)
                 later.addLast(field)
             else {
+                val fieldValue = if (obj.contains(name)) obj[name]!! else JsonNull()
                 unsafeSetValue(instance,
                     field,
                     initializedValue(field),
-                    unwrap(obj[name]!!, field.type))
+                    unwrap(fieldValue, field.type))
             }
         }
 
@@ -334,7 +335,8 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
                         later.addLast(field)
                     else {
                         field.isAccessible = true
-                        field[instance] = unwrap(obj[name]!!, field.type, true, tryUnsafe)
+                        val fieldValue = if (obj.contains(name)) obj[name]!! else JsonNull()
+                        field[instance] = unwrap(fieldValue, field.type, true, tryUnsafe)
                     }
                 }
                 while (later.isNotEmpty()) {
