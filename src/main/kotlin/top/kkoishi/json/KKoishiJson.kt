@@ -84,6 +84,8 @@ class KKoishiJson {
 
         private open class InternalFieldTypeParser<T : Any>(type: Type<T>, override val instance: KKoishiJson) :
             FieldTypeParser<T>(type), InternalParserFactory.Conditional {
+            override fun getParser(type: java.lang.reflect.Type): TypeParser<*> = instance.getParser(type) ?: throw IllegalStateException()
+
             override fun deserializeField(field: Field, o: JsonObject): FieldData {
                 val annotation = field.getDeclaredAnnotation(FieldJsonName::class.java)
                 if (annotation != null) {

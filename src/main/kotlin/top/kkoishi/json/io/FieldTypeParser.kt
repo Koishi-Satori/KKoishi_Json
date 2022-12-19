@@ -1,12 +1,9 @@
 package top.kkoishi.json.io
 
 import top.kkoishi.json.*
-import top.kkoishi.json.JsonPrimitive.Companion.toPrimitive
 import top.kkoishi.json.annotation.DeserializationIgnored
 import top.kkoishi.json.annotation.SerializationIgnored
-import top.kkoishi.json.exceptions.JsonCastException
 import top.kkoishi.json.exceptions.JsonInvalidFormatException
-import top.kkoishi.json.parse.Factorys
 import top.kkoishi.json.internal.Utils.allocateInstance
 import top.kkoishi.json.internal.Utils.compareAndSwapInt
 import top.kkoishi.json.internal.Utils.compareAndSwapLong
@@ -21,15 +18,15 @@ import top.kkoishi.json.internal.Utils.getObject
 import top.kkoishi.json.internal.Utils.getInt
 import top.kkoishi.json.internal.Utils.getLong
 import top.kkoishi.json.internal.Utils.getShort
+import top.kkoishi.json.internal.io.ParserManager
 import top.kkoishi.json.internal.reflect.Allocators
 import top.kkoishi.json.internal.reflect.Reflection
 import top.kkoishi.json.reflect.Type
 import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.lang.reflect.Array as ArrayRef
 import kotlin.jvm.Throws
+import java.lang.reflect.Type as JType
 
 /**
  * This is a type parser with a capacity to serialize/deserialize a json object to an instance of a given class by
@@ -160,6 +157,8 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
         }
     }
 
+    protected open fun getParser(type: JType): TypeParser<*> = ParserManager.getParser(type)
+
     /**
      * Get the default value of the field.
      *
@@ -191,11 +190,11 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
             if (fd.field.getAnnotation(SerializationIgnored::class.java) != null)
                 later.addLast(fd)
             else
-                obj[fd.name] = wrap(unsafeGetField(fd.field, t))
+                obj[fd.name] = wrap(unsafeGetField(fd.field, t), fd.field.genericType)
         }
         while (later.isNotEmpty()) {
             val fd = later.removeFirst()
-            obj[fd.name] = wrap(defaultValue(fd.field, t as Any))
+            obj[fd.name] = wrap(defaultValue(fd.field, t as Any), fd.field.genericType)
         }
         return obj
     }
@@ -248,53 +247,27 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
     }
 
     /**
-     * Unwrap the json element to a instance of the given type.
+     * Unwrap the json element to an instance of the given type.
      *
      * @param json The json element.
-     * @param clz The class to be converted.
-     * @param safe If this method use safety FieldTypeParser when parsing json object.
-     * @param tryUnsafe if try unsafe when use safe.
+     * @param type The class to be converted.
      * @return unwrapped value.
      */
-    private fun <Type> unwrap(
+    private fun unwrap(
         json: JsonElement,
-        clz: Class<Type>,
-        safe: Boolean = false,
-        tryUnsafe: Boolean = true,
+        type: JType,
     ): Any? {
-        return when (json.typeTag) {
-            JsonElement.NULL -> null
-            JsonElement.ARRAY -> {
-                if (clz.isArray)
-                    Factorys.getArrayTypeFactory().create(Type(clz)).fromJson(json)
-                throw JsonCastException()
-            }
-            JsonElement.PRIMITIVE -> json.toJsonPrimitive().toPrimitive(clz)
-            else -> {
-                val factory = Factorys.getFactoryFromClass(clz)
-                if (safe) {
-                    if (factory is FieldTypeParserFactory)
-                        return factory.fieldParser().create(Type(clz)).safe(tryUnsafe).fromJson(json)
-                }
-                return factory.create(Type(clz)).fromJson(json)
-            }
-        }
+        if (json.isJsonNull())
+            return null
+        return getParser(type).fromJson(json)
     }
 
-    protected fun wrap(v: Any?): JsonElement {
+    @Suppress("UNCHECKED_CAST")
+    protected fun wrap(v: Any?, type: JType): JsonElement {
         if (v == null)
             return JsonNull()
-        if (checkPrimitive(v))
-            return wrapJsonPrimitive(v)
-        val clz = v.javaClass
-        if (clz.isArray) {
-            val len = ArrayRef.getLength(v)
-            val elements = ArrayDeque<JsonElement>(len)
-            for (index in 0 until len)
-                elements.addLast(wrap(ArrayRef.get(v, index)))
-            return JsonArray(elements)
-        }
-        return Factorys.getFactoryFromClass(clz).create(Type(clz)).toJson(v)
+        val parser: TypeParser<in Any> = getParser(type) as TypeParser<in Any>
+        return parser.toJson(v)
     }
 
     private fun wrapJsonPrimitive(v: Any): JsonPrimitive = JsonPrimitive.createActual(v)
@@ -336,7 +309,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
                     else {
                         field.isAccessible = true
                         val fieldValue = if (obj.contains(name)) obj[name]!! else JsonNull()
-                        field[instance] = unwrap(fieldValue, field.type, true, tryUnsafe)
+                        field[instance] = unwrap(fieldValue, field.type)
                     }
                 }
                 while (later.isNotEmpty()) {
@@ -355,12 +328,12 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
                         later.addLast(fd)
                     else {
                         fd.field.isAccessible = true
-                        obj[fd.name] = wrap(fd.field[t])
+                        obj[fd.name] = wrap(fd.field[t], fd.field.genericType)
                     }
                 }
                 while (later.isNotEmpty()) {
                     val fd = later.removeFirst()
-                    obj[fd.name] = wrap(defaultValue(fd.field, t as Any))
+                    obj[fd.name] = wrap(defaultValue(fd.field, t as Any), fd.field.genericType)
                 }
                 return obj
             }

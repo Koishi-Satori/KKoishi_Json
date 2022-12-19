@@ -24,7 +24,7 @@ import static java.lang.System.out;
 
 public final class Test {
     public static void main (String[] args) throws Exception {
-        //testRef();
+        testRef();
         //testArrayRef();
         //testMapRef();
         test();
