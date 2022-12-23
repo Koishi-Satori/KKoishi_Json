@@ -325,6 +325,8 @@ class KKoishiJson {
     @Suppress("UNCHECKED_CAST")
     private fun getParser(type: JType): TypeParser<*>? {
         if (type is ParameterizedType) {
+            if (stored.containsKey(type))
+                return stored[type]!!.create(Type(type))
             val parameters = type.actualTypeArguments
             val raw = Reflection.getRawType(type.rawType)
             if (parameters.size == 2 && Reflection.isMap(raw))
@@ -337,7 +339,7 @@ class KKoishiJson {
         } else if (type is Class<*>) {
             if (Reflection.checkJsonPrimitive(type))
                 return UtilParsers.getPrimitiveParser(type)
-            fun getFromType() = getFactoryFromClass(type).create(Type(type))
+            fun getFromType(): TypeParser<*> = (getFactoryFromClass(type) ?: getIfNotContainsFromClass(type)).create(Type(type))
 
             val getter = Reflection.checkFactoryGetter(type)
             if (getter != null) {
@@ -351,22 +353,22 @@ class KKoishiJson {
                 stored[type] = factory
                 return factory.create(Type(type))
             }
-            return getFactoryFromClass(type).create(Type(type))
+            return (getFactoryFromClass(type) ?: getIfNotContainsFromClass(type)).create(Type(type))
         } else if (type is GenericArrayType) {
             // TODO: may have bugs.
             val cmpType = type.genericComponentType
             if (cmpType is ParameterizedType) {
                 val tp = Type<Any>(type)
-                return getFactoryFromClass(tp.rawType()).create(tp)
+                return (getFactoryFromClass(tp.rawType()) ?: getIfNotContainsFromClass(tp.rawType())).create(tp)
             }
         }
         return null
     }
 
-    private fun getFactoryFromClass(type: Class<*>): TypeParserFactory {
+    private fun getFactoryFromClass(type: Class<*>): TypeParserFactory? {
         if (stored.containsKey(type))
             return stored[type]!!
-        return getIfNotContainsFromClass(type)
+        return null
     }
 
     private fun getIfNotContainsFromClass(type: Class<*>): TypeParserFactory {

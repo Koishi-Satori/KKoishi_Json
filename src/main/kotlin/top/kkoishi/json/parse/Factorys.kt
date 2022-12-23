@@ -22,6 +22,12 @@ object Factorys {
     }
 
     @JvmStatic
+    @JvmName(" get")
+    internal fun get(type: JType): TypeParserFactory? {
+        return stored.getOrDefault(type, null)
+    }
+
+    @JvmStatic
     fun getFieldTypeFactory(): TypeParserFactory = FieldTypeParserFactory.` instance`
 
     @JvmStatic

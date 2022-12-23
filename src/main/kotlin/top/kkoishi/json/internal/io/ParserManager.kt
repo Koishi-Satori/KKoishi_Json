@@ -12,6 +12,10 @@ internal object ParserManager {
     @Suppress("UNCHECKED_CAST")
     fun getParser(type: Type): TypeParser<*> {
         if (type is ParameterizedType) {
+            val factory = Factorys.get(type)
+            if (factory != null)
+                return factory.create(KType(type))
+
             val parameters = type.actualTypeArguments
             val raw = Reflection.getRawType(type.rawType)
             if (parameters.size == 2 && Reflection.isMap(raw))
