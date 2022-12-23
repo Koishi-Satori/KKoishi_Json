@@ -12,9 +12,9 @@ import java.util.*
 import kotlin.jvm.Throws
 
 internal object Utils {
-    internal fun KKoishiJsonInit(inst: KKoishiJson): MutableMap<Type, TypeParserFactory> {
+    internal fun KKoishiJsonInit(inst: KKoishiJson): List<Pair<Type, TypeParserFactory>> {
         // TODO: init some basic classes.
-        return mutableMapOf(getFactory(Date::class.java, DateParser(inst)))
+        return listOf(getFactory(Date::class.java, DateParser(inst)))
     }
 
     @JvmStatic

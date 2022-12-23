@@ -11,9 +11,7 @@ import top.kkoishi.json.internal.io.UtilParsers
 import top.kkoishi.json.internal.reflect.Allocators
 import top.kkoishi.json.internal.reflect.Reflection
 import top.kkoishi.json.io.*
-import top.kkoishi.json.parse.Factorys
-import top.kkoishi.json.parse.NumberMode
-import top.kkoishi.json.parse.Platform
+import top.kkoishi.json.parse.*
 import top.kkoishi.json.reflect.Type
 import top.kkoishi.json.reflect.TypeResolver
 import java.io.Reader
@@ -26,25 +24,38 @@ import java.util.*
 import java.lang.reflect.Type as JType
 
 class KKoishiJson {
-    val dateStyle: Int
-    val timeStyle: Int
-    val locale: Locale
-    val useUnsafe: Boolean
-    val ignoreNull: Boolean
+    var dateStyle: Int
+    var timeStyle: Int
+    var locale: Locale
+    var useUnsafe: Boolean
+    var ignoreNull: Boolean
+    var platform: Platform
+    var mode: NumberMode
 
     private lateinit var stored: MutableMap<JType, TypeParserFactory>
     private lateinit var fieldParserFactory: InternalFieldParserFactory
     private var ignoredModifiers: Int = 0x0000
 
-    @Suppress("RemoveRedundantSpreadOperator")
-    constructor() : this(*arrayOf())
-
-    constructor(vararg initFactories: Pair<JType, TypeParserFactory>) : this(DEFAULT_DATE_STYLE,
+    @JvmOverloads
+    constructor(
+        useUnsafe: Boolean,
+        initFactories: List<Pair<JType, TypeParserFactory>> = listOf(),
+    ) : this(DEFAULT_DATE_STYLE,
         DEFAULT_TIME_STYLE,
         DEFAULT_LOCALE,
-        DEFAULT_USE_UNSAFE,
+        useUnsafe,
         DEFAULT_IGNORE_NULL,
-        *initFactories)
+        initFactories)
+
+    @JvmOverloads
+    constructor(
+        dateStyle: Int = DEFAULT_DATE_STYLE,
+        timeStyle: Int = DEFAULT_TIME_STYLE,
+        locale: Locale = DEFAULT_LOCALE,
+        useUnsafe: Boolean = DEFAULT_USE_UNSAFE,
+        ignoreNull: Boolean = DEFAULT_IGNORE_NULL,
+        initFactories: List<Pair<JType, TypeParserFactory>> = listOf(),
+    ) : this(dateStyle, timeStyle, locale, useUnsafe, ignoreNull, Platform.LINUX, NumberMode.ALL_TYPE, initFactories)
 
     constructor(
         dateStyle: Int,
@@ -52,20 +63,28 @@ class KKoishiJson {
         locale: Locale,
         useUnsafe: Boolean,
         ignoreNull: Boolean,
-        vararg initFactories: Pair<JType, TypeParserFactory>,
+        platform: Platform,
+        numberMode: NumberMode,
+        initFactories: List<Pair<JType, TypeParserFactory>>,
     ) {
         this.dateStyle = dateStyle
         this.timeStyle = timeStyle
         this.locale = locale
         this.useUnsafe = useUnsafe
         this.ignoreNull = ignoreNull
+        this.platform = platform
+        this.mode = numberMode
 
         for ((tp, factory) in initFactories) {
             stored[tp] = factory
         }
 
         fieldParserFactory = InternalFieldParserFactory(this)
-        stored = KKoishiJsonInit(this)
+        for ((tp, factory) in KKoishiJsonInit(this)) {
+            val value = stored[tp]
+            if (value == null)
+                stored[tp] = factory
+        }
     }
 
     private companion object {
@@ -84,7 +103,8 @@ class KKoishiJson {
 
         private open class InternalFieldTypeParser<T : Any>(type: Type<T>, override val instance: KKoishiJson) :
             FieldTypeParser<T>(type), InternalParserFactory.Conditional {
-            override fun getParser(type: java.lang.reflect.Type): TypeParser<*> = instance.getParser(type) ?: throw IllegalStateException()
+            override fun getParser(type: java.lang.reflect.Type): TypeParser<*> =
+                instance.getParser(type) ?: throw IllegalStateException()
 
             override fun deserializeField(field: Field, o: JsonObject): FieldData {
                 val annotation = field.getDeclaredAnnotation(FieldJsonName::class.java)
@@ -246,11 +266,14 @@ class KKoishiJson {
         return buffer.toString()
     }
 
-    @JvmOverloads
+    fun fromJsonString(json: String): JsonElement = JsonParserFactory(platform, mode).create(json).parse()
+
+    fun <T> toJsonString(typeofT: JType, instance: T?): String = toJsonString(toJson(typeofT, instance))
+
+    fun <T> fromJsonString(typeofT: JType, json: String): T? = fromJson(typeofT, fromJsonString(json))
+
     fun reader(
         reader: Reader,
-        platform: Platform = Platform.LINUX,
-        mode: NumberMode = NumberMode.ALL_TYPE,
     ): JsonReader = JsonReader(reader, platform, mode)
 
     @JvmOverloads
@@ -339,7 +362,8 @@ class KKoishiJson {
         } else if (type is Class<*>) {
             if (Reflection.checkJsonPrimitive(type))
                 return UtilParsers.getPrimitiveParser(type)
-            fun getFromType(): TypeParser<*> = (getFactoryFromClass(type) ?: getIfNotContainsFromClass(type)).create(Type(type))
+            fun getFromType(): TypeParser<*> =
+                (getFactoryFromClass(type) ?: getIfNotContainsFromClass(type)).create(Type(type))
 
             val getter = Reflection.checkFactoryGetter(type)
             if (getter != null) {

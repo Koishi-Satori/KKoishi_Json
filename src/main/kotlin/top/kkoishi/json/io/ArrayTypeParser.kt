@@ -24,7 +24,6 @@ class ArrayTypeParser<T> private constructor(type: Type<T>) : TypeParser<T>(type
     }
 
     init {
-        // TODO: replace the array check.
         if (!(type.rawType().isArray || type.type() is GenericArrayType))
             throw IllegalArgumentException("The type ${type.rawType()} should be a array type")
     }
