@@ -10,12 +10,32 @@ import java.math.BigInteger
 import java.util.*
 import java.util.stream.Collectors
 import kotlin.collections.ArrayDeque
+import top.kkoishi.json.reflect.Modifier as Mod
 import top.kkoishi.json.reflect.Type as KType
 import kotlin.Array as KArray
 
 internal object Reflection {
     const val ACC_PUBLIC = 0x0001
     const val ACC_PRIVATE = 0x0002
+    const val ACC_PROTECTED = 0x0004
+    const val ACC_STATIC = 0x0008
+    const val ACC_FINAL = 0x0010
+    const val ACC_VOLATILE = 0x0040
+    const val ACC_TRANSIENT = 0x0080
+    const val ACC_SYNTHETIC = 0x1000
+    const val ACC_ENUM = 0x4000
+
+    @JvmStatic
+    internal val FIELD_MODIFIERS: KArray<Pair<Int, Mod>> =
+        arrayOf(ACC_ENUM to Mod.ENUM,
+            ACC_SYNTHETIC to Mod.SYNTHETIC,
+            ACC_TRANSIENT to Mod.TRANSIENT,
+            ACC_VOLATILE to Mod.VOLATILE,
+            ACC_FINAL to Mod.FINAL,
+            ACC_STATIC to Mod.STATIC,
+            ACC_PROTECTED to Mod.PROTECTED,
+            ACC_PRIVATE to Mod.PRIVATE,
+            ACC_PUBLIC to Mod.PUBLIC)
 
     @JvmStatic
     internal fun isTransient(field: Field): Boolean = Modifier.isTransient(field.modifiers)

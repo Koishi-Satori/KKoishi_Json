@@ -12,6 +12,8 @@ import top.kkoishi.json.internal.reflect.Allocators
 import top.kkoishi.json.internal.reflect.Reflection
 import top.kkoishi.json.io.*
 import top.kkoishi.json.parse.*
+import top.kkoishi.json.reflect.Modifier
+import top.kkoishi.json.reflect.Modifier.Companion.modifier
 import top.kkoishi.json.reflect.Type
 import top.kkoishi.json.reflect.TypeResolver
 import java.io.Reader
@@ -20,7 +22,9 @@ import java.lang.reflect.Field
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Modifier as JModifier
 import java.util.*
+import kotlin.collections.ArrayDeque
 import java.lang.reflect.Type as JType
 
 class KKoishiJson {
@@ -35,6 +39,8 @@ class KKoishiJson {
     private lateinit var stored: MutableMap<JType, TypeParserFactory>
     private lateinit var fieldParserFactory: InternalFieldParserFactory
     private var ignoredModifiers: Int = 0x0000
+
+    /*-------------------------------- Constructors ------------------------------------*/
 
     @JvmOverloads
     constructor(
@@ -87,6 +93,8 @@ class KKoishiJson {
         }
     }
 
+    /*-------------------------------- Static Part ------------------------------------*/
+
     private companion object {
         private const val DEFAULT_DATE_STYLE = 2
         private const val DEFAULT_TIME_STYLE = 2
@@ -105,6 +113,24 @@ class KKoishiJson {
             FieldTypeParser<T>(type), InternalParserFactory.Conditional {
             override fun getParser(type: java.lang.reflect.Type): TypeParser<*> =
                 instance.getParser(type) ?: throw IllegalStateException()
+
+            override fun deserializeAllFields(o: JsonObject): ArrayDeque<FieldData> {
+                val declaredFields = type.rawType().declaredFields
+                val fields: ArrayDeque<FieldData> = ArrayDeque(declaredFields.size)
+                for (field in declaredFields)
+                    if (instance.checkField(field))
+                        fields.addLast(deserializeField(field, o))
+                return fields
+            }
+
+            override fun serializeAllFields(): ArrayDeque<FieldData> {
+                val declaredFields = type.rawType().declaredFields
+                val fields: ArrayDeque<FieldData> = ArrayDeque(declaredFields.size)
+                for (field in declaredFields)
+                    if (instance.checkField(field))
+                        fields.addLast(serializeField(field))
+                return fields
+            }
 
             override fun deserializeField(field: Field, o: JsonObject): FieldData {
                 val annotation = field.getDeclaredAnnotation(FieldJsonName::class.java)
@@ -159,6 +185,8 @@ class KKoishiJson {
             }
         }
     }
+
+    /*-------------------------------- Public methods ------------------------------------*/
 
     @Suppress("UNCHECKED_CAST")
     fun <T> toJson(typeResolver: TypeResolver<T?>, instance: T?): JsonElement where T : Any {
@@ -279,6 +307,22 @@ class KKoishiJson {
     @JvmOverloads
     fun writer(writer: Writer, lineSeparator: String = "\n"): JsonWriter {
         return BasicJsonWriter(writer, lineSeparator)
+    }
+
+    fun ignoredModifiers(): MutableList<Modifier> = ignoredModifiers.modifier()
+
+    fun setIgnoredModifiers(ignoredModifiers: List<Modifier>): KKoishiJson {
+        this.ignoredModifiers = ignoredModifiers.modifier()
+        return this
+    }
+
+    /*-------------------------------- Private methods ------------------------------------*/
+
+    private fun checkField(field: Field): Boolean {
+        val modifiers = field.modifiers
+        if (modifiers > ignoredModifiers)
+            return modifiers.modifier().containsAll(ignoredModifiers())
+        return !(JModifier.isStatic(modifiers) || JModifier.isTransient(modifiers))
     }
 
     private fun writeJson(element: JsonElement, buffer: StringBuilder) {
@@ -438,6 +482,8 @@ class KKoishiJson {
             return true
         return false
     }
+
+    /*-------------------------------- Override methods ------------------------------------*/
 
     override fun toString(): String {
         return "KKoishiJson"
