@@ -1,7 +1,7 @@
 package top.kkoishi.json.internal
 
 import top.kkoishi.json.JsonElement
-import top.kkoishi.json.KKoishiJson
+import top.kkoishi.json.Kson
 import top.kkoishi.json.internal.io.UtilParsers
 import top.kkoishi.json.internal.reflect.Reflection
 import top.kkoishi.json.io.TypeParser
@@ -12,7 +12,7 @@ import java.lang.reflect.Type as JType
 
 internal object InternalParserFactory {
     internal interface Conditional {
-        val instance: KKoishiJson
+        val instance: Kson
     }
 
     @JvmStatic
@@ -27,7 +27,7 @@ internal object InternalParserFactory {
         })
     }
 
-    class DateParser(override val instance: KKoishiJson) : UtilParsers.DateTypeParser(), Conditional {
+    class DateParser(override val instance: Kson) : UtilParsers.DateTypeParser(), Conditional {
         override fun fromJson(json: JsonElement): Date =
             super.fromJson(json, instance.dateStyle, instance.timeStyle, instance.locale)
 

@@ -17,7 +17,6 @@ import top.kkoishi.json.reflect.Modifier.Companion.modifier
 import top.kkoishi.json.reflect.Type
 import top.kkoishi.json.reflect.TypeResolver
 import java.io.Reader
-import java.io.Writer
 import java.lang.reflect.Field
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.Method
@@ -25,9 +24,10 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Modifier as JModifier
 import java.util.*
 import kotlin.collections.ArrayDeque
+import kotlin.collections.HashMap
 import java.lang.reflect.Type as JType
 
-class KKoishiJson {
+class Kson {
     var dateStyle: Int
     var timeStyle: Int
     var locale: Locale
@@ -36,9 +36,10 @@ class KKoishiJson {
     var platform: Platform
     var mode: NumberMode
 
-    private lateinit var stored: MutableMap<JType, TypeParserFactory>
-    private lateinit var fieldParserFactory: InternalFieldParserFactory
+    private val stored: ThreadLocal<MutableMap<JType, TypeParserFactory>> = ThreadLocal()
+    private var fieldParserFactory: InternalFieldParserFactory
     private var ignoredModifiers: Int = 0x0000
+    private val jsonWriter: Writer?
 
     /*-------------------------------- Constructors ------------------------------------*/
 
@@ -72,6 +73,18 @@ class KKoishiJson {
         platform: Platform,
         numberMode: NumberMode,
         initFactories: List<Pair<JType, TypeParserFactory>>,
+    ) : this(dateStyle, timeStyle, locale, useUnsafe, ignoreNull, platform, numberMode, DEFAULT_WRITER, initFactories)
+
+    private constructor(
+        dateStyle: Int,
+        timeStyle: Int,
+        locale: Locale,
+        useUnsafe: Boolean,
+        ignoreNull: Boolean,
+        platform: Platform,
+        numberMode: NumberMode,
+        writer: Writer?,
+        initFactories: List<Pair<JType, TypeParserFactory>>,
     ) {
         this.dateStyle = dateStyle
         this.timeStyle = timeStyle
@@ -80,7 +93,10 @@ class KKoishiJson {
         this.ignoreNull = ignoreNull
         this.platform = platform
         this.mode = numberMode
+        jsonWriter = writer
 
+        this.stored.set(HashMap())
+        val stored = this.stored.get()
         for ((tp, factory) in initFactories) {
             stored[tp] = factory
         }
@@ -101,15 +117,126 @@ class KKoishiJson {
 
         @JvmStatic
         private val DEFAULT_LOCALE = Locale.getDefault()
+
+        @JvmStatic
+        private val DEFAULT_WRITER: Writer? = null
         private const val DEFAULT_USE_UNSAFE = true
         private const val DEFAULT_IGNORE_NULL = false
 
-        private class InternalFieldParserFactory(override val instance: KKoishiJson) : TypeParserFactory,
+        private class Format(
+            val forward: String,
+            val componentSeparator: String,
+        ) {
+            var count: Int = 0
+
+            operator fun inc(): Format {
+                count++
+                return this
+            }
+
+            operator fun dec(): Format {
+                count--
+                return this
+            }
+        }
+
+        private class Writer(
+            private var buffer: StringBuilder, private val format: Format,
+            override val instance: Kson,
+        ) : InternalParserFactory.Conditional {
+            fun apply(buffer: StringBuilder) {
+                this.buffer = buffer
+            }
+
+            fun write(element: JsonElement) {
+                if (element.isJsonNull()) {
+                    if (!instance.ignoreNull)
+                        buffer.append("null")
+                } else
+                    writeElement(element)
+            }
+
+            private fun writeElement(element: JsonElement) {
+                if (element.isJsonPrimitive())
+                    buffer.append(element.toString())
+                else if (element.isJsonArray())
+                    writeArray(element.toJsonArray())
+                else
+                    writeObject(element.toJsonObject())
+            }
+
+            private fun writeObject(obj: JsonObject) {
+                adjust().append('{')
+                format.inc()
+                val rest = obj.iterator()
+                if (rest.hasNext())
+                    while (true) {
+                        val (k, v) = rest.next()
+                        if (v.isJsonNull()) {
+                            if (!rest.hasNext()) {
+                                if (instance.ignoreNull)
+                                    break
+                                else
+                                    adjust().append('"').append(k).append("\": ").append("null")
+                                        .append(format.componentSeparator)
+                            } else {
+                                if (!instance.ignoreNull)
+                                    adjust().append('"').append(k).append("\": ").append("null, ")
+                                        .append(format.componentSeparator)
+                            }
+                        } else {
+                            adjust().append('"').append(k).append("\": ")
+                            writeElement(v)
+                            if (!rest.hasNext()) {
+                                buffer.append(format.componentSeparator)
+                                break
+                            }
+                            adjust().append(", ").append(format.componentSeparator)
+                        }
+                    }
+                adjust().append('}')
+                format.dec()
+            }
+
+            private fun writeArray(arr: JsonArray) {
+                adjust().append('[')
+                format.inc()
+                val rest = arr.iterator()
+                if (rest.hasNext())
+                    while (true) {
+                        val element = rest.next()
+                        if (element.isJsonNull()) {
+                            if (!rest.hasNext()) {
+                                if (instance.ignoreNull)
+                                    break
+                                else
+                                    adjust().append("null").append(format.componentSeparator)
+                            } else {
+                                if (!instance.ignoreNull)
+                                    adjust().append("null, ").append(format.componentSeparator)
+                            }
+                        } else {
+                            writeElement(element)
+                            if (!rest.hasNext()) {
+                                buffer.append(format.componentSeparator)
+                                break
+                            }
+                            adjust().append(", ").append(format.componentSeparator)
+                        }
+                    }
+                adjust().append(']')
+                format.dec()
+            }
+
+            private fun adjust(): StringBuilder = buffer.append(format.forward.repeat(format.count))
+        }
+
+        private class InternalFieldParserFactory(override val instance: Kson) : TypeParserFactory,
             InternalParserFactory.Conditional {
             override fun <T : Any> create(type: Type<T>): TypeParser<T> = InternalFieldTypeParser<T>(type, instance)
         }
 
-        private open class InternalFieldTypeParser<T : Any>(type: Type<T>, override val instance: KKoishiJson) :
+        private open class InternalFieldTypeParser<T : Any>(type: Type<T>, override val instance: Kson) :
             FieldTypeParser<T>(type), InternalParserFactory.Conditional {
             override fun getParser(type: java.lang.reflect.Type): TypeParser<*> =
                 instance.getParser(type) ?: throw IllegalStateException()
@@ -285,12 +412,17 @@ class KKoishiJson {
     }
 
     fun toJsonString(element: JsonElement): String {
-        if (element.isJsonNull())
-            return if (ignoreNull)
-                ""
-            else "null"
         val buffer = StringBuilder()
-        writeJson(element, buffer)
+        if (jsonWriter == null) {
+            if (element.isJsonNull())
+                return if (ignoreNull)
+                    ""
+                else "null"
+            writeJson(element, buffer)
+            return buffer.toString()
+        }
+        jsonWriter.apply(buffer)
+        jsonWriter.write(element)
         return buffer.toString()
     }
 
@@ -305,15 +437,22 @@ class KKoishiJson {
     ): JsonReader = JsonReader(reader, platform, mode)
 
     @JvmOverloads
-    fun writer(writer: Writer, lineSeparator: String = "\n"): JsonWriter {
+    fun writer(writer: java.io.Writer, lineSeparator: String = "\n"): JsonWriter {
         return BasicJsonWriter(writer, lineSeparator)
     }
 
     fun ignoredModifiers(): MutableList<Modifier> = ignoredModifiers.modifier()
 
-    fun setIgnoredModifiers(ignoredModifiers: List<Modifier>): KKoishiJson {
+    fun setIgnoredModifiers(ignoredModifiers: List<Modifier>): Kson {
         this.ignoredModifiers = ignoredModifiers.modifier()
         return this
+    }
+
+    fun <T> toJson(instance: T?): String {
+        if (instance == null) {
+            return if (ignoreNull) "" else "null"
+        }
+        return toJsonString(instance.javaClass, instance)
     }
 
     /*-------------------------------- Private methods ------------------------------------*/
@@ -391,6 +530,7 @@ class KKoishiJson {
 
     @Suppress("UNCHECKED_CAST")
     private fun getParser(type: JType): TypeParser<*>? {
+        val stored = this.stored.get()
         if (type is ParameterizedType) {
             if (stored.containsKey(type))
                 return stored[type]!!.create(Type(type))
@@ -407,7 +547,7 @@ class KKoishiJson {
             if (Reflection.checkJsonPrimitive(type))
                 return UtilParsers.getPrimitiveParser(type)
             fun getFromType(): TypeParser<*> =
-                (getFactoryFromClass(type) ?: getIfNotContainsFromClass(type)).create(Type(type))
+                (getFactoryFromClass(type, stored) ?: getIfNotContainsFromClass(type)).create(Type(type))
 
             val getter = Reflection.checkFactoryGetter(type)
             if (getter != null) {
@@ -421,19 +561,22 @@ class KKoishiJson {
                 stored[type] = factory
                 return factory.create(Type(type))
             }
-            return (getFactoryFromClass(type) ?: getIfNotContainsFromClass(type)).create(Type(type))
+            return (getFactoryFromClass(type, stored) ?: getIfNotContainsFromClass(type)).create(Type(type))
         } else if (type is GenericArrayType) {
             // TODO: may have bugs.
             val cmpType = type.genericComponentType
             if (cmpType is ParameterizedType) {
                 val tp = Type<Any>(type)
-                return (getFactoryFromClass(tp.rawType()) ?: getIfNotContainsFromClass(tp.rawType())).create(tp)
+                return (getFactoryFromClass(tp.rawType(), stored) ?: getIfNotContainsFromClass(tp.rawType())).create(tp)
             }
         }
         return null
     }
 
-    private fun getFactoryFromClass(type: Class<*>): TypeParserFactory? {
+    private fun getFactoryFromClass(
+        type: Class<*>,
+        stored: MutableMap<JType, TypeParserFactory> = this.stored.get(),
+    ): TypeParserFactory? {
         if (stored.containsKey(type))
             return stored[type]!!
         return null
@@ -453,6 +596,7 @@ class KKoishiJson {
     private fun getFactory(parameterizedType: ParameterizedType): TypeParserFactory? {
         val arguments = parameterizedType.actualTypeArguments
         val key = Reflection.ParameterizedTypeImpl(parameterizedType.ownerType, parameterizedType.rawType, *arguments)
+        val stored = this.stored.get()
         if (stored.containsKey(key)) {
             return stored[key]!!
         }

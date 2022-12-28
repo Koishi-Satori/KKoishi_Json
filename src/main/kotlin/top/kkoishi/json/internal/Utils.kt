@@ -1,6 +1,6 @@
 package top.kkoishi.json.internal
 
-import top.kkoishi.json.KKoishiJson
+import top.kkoishi.json.Kson
 import top.kkoishi.json.exceptions.UnsupportedException
 import top.kkoishi.json.internal.InternalParserFactory.DateParser
 import top.kkoishi.json.internal.InternalParserFactory.getFactory
@@ -12,7 +12,7 @@ import java.util.*
 import kotlin.jvm.Throws
 
 internal object Utils {
-    internal fun KKoishiJsonInit(inst: KKoishiJson): List<Pair<Type, TypeParserFactory>> {
+    internal fun KKoishiJsonInit(inst: Kson): List<Pair<Type, TypeParserFactory>> {
         // TODO: init some basic classes.
         return listOf(getFactory(Date::class.java, DateParser(inst)))
     }
