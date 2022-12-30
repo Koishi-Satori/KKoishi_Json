@@ -27,19 +27,92 @@ import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
 import java.lang.reflect.Type as JType
 
+/**
+ * This is the main class for using kkoishi.json.
+ * After built an instance, you can use [toJson], [toJsonString] to serialize an object to JsonElement
+ * or json string and use [fromJson], [fromJsonString] to deserialize a json string or JsonElement to
+ * an object.
+ * Currently, a Kson instance is not fully thread-safe.
+ *
+ * You can use constructors in Kson to create an instance, if the default/optional configuration provided
+ * by constructors is all you need. Or you can also invoke methods in [KsonBuilder] to customize the pretty
+ * output, the ignored modifiers and so on.
+ *
+ * Here is an example of how to use this class on a simple class.
+ *
+ * ```
+ * // In Java
+ * Kson kson = new Kson();
+ * MyClass instance = new MyClass();
+ * JsonElement ele = kson.toJson(MyClass.class, instance);
+ * String jsonStr = kson.toJson(instance);
+ * MyClass instance1 = kson.fromJson(MyClass.class, jsonStr);
+ *
+ * // In Kotlin
+ * val kson = Kson();
+ * val instance = MyClass();
+ * val ele = kson.toJson(MyClass::class.java, instance);
+ * val jsonStr = kson.toJson(instance);
+ * val instance1 = kson.fromJson(MyClass::class.java, jsonStr);
+ * ```
+ * This example is fitted to most classes, but for those classes with generic-parameters, you need to
+ * use the methods with [TypeResolver] as its parameters or pass a [ParameterizedType]
+ * (For example, List<MyClass>, Map<String, MyType>) and the generic-parameters in
+ * [ParameterizedType.getActualTypeArguments] can not be *Object.class*.
+ *
+ * All the classes implemented [Map] and [Collection] can be correctly serialize/deserialize
+ * (By invoke add/put and traverse them), and other generic classes should register their [TypeParserFactory].
+ * The map will be serialized to [JsonObject] and when deserializing you need make sure input is JsonObject.
+ * And the collection will be serialized to [JsonArray].
+ * How to serialize classes with generic-parameters:
+ *
+ * ```
+ * Kson kson = new Kson();
+ * List<MyType> list = new LinkedList();
+ * // Ignore add some elements.
+ * TypeResolver<MyType> resolver = new TypeResolver() {};
+ * JsonArray arr = kson.toJson(resolver, list).toJsonArray();
+ * String json = kson.toJsonString(resolver, list);
+ * List<MyType> list2 = kson.fromJson(resolver, json);
+ * ```
+ *
+ * Special json serialize/deserialize policy:
+ *
+ * Annotations:
+ * In top.kkoishi.json.annotation, you can find [DeserializationIgnored], [SerializationIgnored], [FieldJsonName]
+ * and [top.kkoishi.json.annotation.FactoryGetter].
+ *
+ * FieldJsonName can be used to customize the field name when serialize/deserialize. There are two field, name and
+ * alternate. the name field is used to customize the key-value pairs' name when serialize/deserialize and the
+ * alternate will be used when the TypeParse can not find the correct field in deserializing.
+ *
+ * FactoryGetter is designed to find the TypeParserFactory of a class. And if you provide it, it will be invoked
+ * firstly. The only field getterDescriptor is the descriptor of the getter method, and it must be like *parse(Ljava/lang/String)V*.
+ *
+ * DeserializationIgnored and SerializationIgnored is used to ignore the field when serialize/deserialize.
+ *
+ * Interfaces:
+ * [top.kkoishi.json.reflect.TypeHelper.TypeParserFactoryGetter]: This is used to get TypeParserFactory.
+ *
+ * @author KKoishi_
+ * @see TypeParser
+ * @see TypeResolver
+ * @see TypeParserFactory
+ */
 class Kson {
-    var dateStyle: Int
-    var timeStyle: Int
-    var locale: Locale
-    var useUnsafe: Boolean
-    var ignoreNull: Boolean
-    var platform: Platform
-    var mode: NumberMode
+    val dateStyle: Int
+    val timeStyle: Int
+    val locale: Locale
+    val useUnsafe: Boolean
+    val ignoreNull: Boolean
+    val htmlEscape: Boolean
 
+    private val platform: Platform
+    private val mode: NumberMode
     private val stored: ThreadLocal<MutableMap<JType, TypeParserFactory>> = ThreadLocal()
     private var fieldParserFactory: InternalFieldParserFactory
     private var ignoredModifiers: Int = 0x0000
-    private val jsonWriter: Writer?
+    private val jsonWriter: ThreadLocal<Writer?> = ThreadLocal()
 
     /*-------------------------------- Constructors ------------------------------------*/
 
@@ -62,18 +135,16 @@ class Kson {
         useUnsafe: Boolean = DEFAULT_USE_UNSAFE,
         ignoreNull: Boolean = DEFAULT_IGNORE_NULL,
         initFactories: List<Pair<JType, TypeParserFactory>> = listOf(),
-    ) : this(dateStyle, timeStyle, locale, useUnsafe, ignoreNull, Platform.LINUX, NumberMode.ALL_TYPE, initFactories)
-
-    constructor(
-        dateStyle: Int,
-        timeStyle: Int,
-        locale: Locale,
-        useUnsafe: Boolean,
-        ignoreNull: Boolean,
-        platform: Platform,
-        numberMode: NumberMode,
-        initFactories: List<Pair<JType, TypeParserFactory>>,
-    ) : this(dateStyle, timeStyle, locale, useUnsafe, ignoreNull, platform, numberMode, DEFAULT_WRITER, initFactories)
+    ) : this(dateStyle,
+        timeStyle,
+        locale,
+        useUnsafe,
+        ignoreNull,
+        Platform.LINUX,
+        NumberMode.ALL_TYPE,
+        DEFAULT_WRITER,
+        DEFAULT_HTML_ESCAPE,
+        initFactories)
 
     private constructor(
         dateStyle: Int,
@@ -84,6 +155,7 @@ class Kson {
         platform: Platform,
         numberMode: NumberMode,
         writer: Writer?,
+        htmlEscape: Boolean,
         initFactories: List<Pair<JType, TypeParserFactory>>,
     ) {
         this.dateStyle = dateStyle
@@ -93,7 +165,8 @@ class Kson {
         this.ignoreNull = ignoreNull
         this.platform = platform
         this.mode = numberMode
-        jsonWriter = writer
+        this.htmlEscape = htmlEscape
+        jsonWriter.set(writer)
 
         this.stored.set(HashMap())
         val stored = this.stored.get()
@@ -111,7 +184,7 @@ class Kson {
 
     /*-------------------------------- Static Part ------------------------------------*/
 
-    private companion object {
+    internal companion object {
         private const val DEFAULT_DATE_STYLE = 2
         private const val DEFAULT_TIME_STYLE = 2
 
@@ -120,8 +193,68 @@ class Kson {
 
         @JvmStatic
         private val DEFAULT_WRITER: Writer? = null
+
         private const val DEFAULT_USE_UNSAFE = true
         private const val DEFAULT_IGNORE_NULL = false
+        private const val DEFAULT_HTML_ESCAPE = false
+
+        @JvmStatic
+        private val htmlEscapes =
+            mapOf<Char, String>(' ' to "&emsp;",
+                ' ' to "&ensp;",
+                ' ' to "&nbsp",
+                '<' to "&lt;",
+                '>' to "&gt;",
+                '&' to "&amp;",
+                '®' to "&reg;",
+                '©' to "&copy;",
+                '¥' to "&yen;",
+                '™' to "&trade;",
+                '÷' to "&divide;",
+                '×' to "&times;",
+                '"' to "&quot;",
+                '\'' to "&apos;",
+                '·' to "&middot;",
+                '°' to "&deg;")
+
+        @JvmStatic
+        @JvmName(" getWriter")
+        internal fun getWriter(indent: String, componentSeparator: String, instance: Kson): Any =
+            Writer(StringBuilder(), Format(indent, componentSeparator), instance)
+
+        @JvmStatic
+        @JvmName(" getInstance")
+        internal fun getInstance(
+            dateStyle: Int,
+            timeStyle: Int,
+            locale: Locale,
+            useUnsafe: Boolean,
+            ignoreNull: Boolean,
+            platform: Platform,
+            numberMode: NumberMode,
+            writer: Any?,
+            htmlEscape: Boolean,
+            initFactories: List<Pair<JType, TypeParserFactory>>,
+        ): Kson {
+            return Kson(dateStyle,
+                timeStyle,
+                locale,
+                useUnsafe,
+                ignoreNull,
+                platform,
+                numberMode,
+                writer as Writer?,
+                htmlEscape,
+                initFactories)
+        }
+
+        @JvmStatic
+        @JvmName(" setWriter")
+        internal fun setWriter(instance: Kson, writer: Any?) {
+            synchronized(instance.jsonWriter) {
+                instance.jsonWriter.set(writer as Writer)
+            }
+        }
 
         private class Format(
             val forward: String,
@@ -156,17 +289,17 @@ class Kson {
                     writeElement(element)
             }
 
-            private fun writeElement(element: JsonElement) {
+            private fun writeElement(element: JsonElement, inEntry: Boolean = false) {
                 if (element.isJsonPrimitive())
                     buffer.append(element.toString())
                 else if (element.isJsonArray())
-                    writeArray(element.toJsonArray())
+                    writeArray(element.toJsonArray(), inEntry)
                 else
-                    writeObject(element.toJsonObject())
+                    writeObject(element.toJsonObject(), inEntry)
             }
 
-            private fun writeObject(obj: JsonObject) {
-                adjust().append('{')
+            private fun writeObject(obj: JsonObject, inEntry: Boolean = false) {
+                (if (inEntry) buffer else adjust()).append('{').append('\n')
                 format.inc()
                 val rest = obj.iterator()
                 if (rest.hasNext())
@@ -186,20 +319,20 @@ class Kson {
                             }
                         } else {
                             adjust().append('"').append(k).append("\": ")
-                            writeElement(v)
+                            writeElement(v, true)
                             if (!rest.hasNext()) {
                                 buffer.append(format.componentSeparator)
                                 break
                             }
-                            adjust().append(", ").append(format.componentSeparator)
+                            buffer.append(", ").append(format.componentSeparator)
                         }
                     }
-                adjust().append('}')
                 format.dec()
+                adjust().append('}')
             }
 
-            private fun writeArray(arr: JsonArray) {
-                adjust().append('[')
+            private fun writeArray(arr: JsonArray, inEntry: Boolean = false) {
+                (if (inEntry) buffer else adjust()).append('[').append('\n')
                 format.inc()
                 val rest = arr.iterator()
                 if (rest.hasNext())
@@ -216,16 +349,16 @@ class Kson {
                                     adjust().append("null, ").append(format.componentSeparator)
                             }
                         } else {
-                            writeElement(element)
+                            writeElement(element, true)
                             if (!rest.hasNext()) {
                                 buffer.append(format.componentSeparator)
                                 break
                             }
-                            adjust().append(", ").append(format.componentSeparator)
+                            buffer.append(", ").append(format.componentSeparator)
                         }
                     }
-                adjust().append(']')
                 format.dec()
+                adjust().append(']')
             }
 
             private fun adjust(): StringBuilder = buffer.append(format.forward.repeat(format.count))
@@ -412,18 +545,9 @@ class Kson {
     }
 
     fun toJsonString(element: JsonElement): String {
-        val buffer = StringBuilder()
-        if (jsonWriter == null) {
-            if (element.isJsonNull())
-                return if (ignoreNull)
-                    ""
-                else "null"
-            writeJson(element, buffer)
-            return buffer.toString()
-        }
-        jsonWriter.apply(buffer)
-        jsonWriter.write(element)
-        return buffer.toString()
+        if (htmlEscape)
+            return htmlTranslate(toJsonStringImpl(element))
+        return toJsonStringImpl(element)
     }
 
     fun fromJsonString(json: String): JsonElement = JsonParserFactory(platform, mode).create(json).parse()
@@ -457,11 +581,37 @@ class Kson {
 
     /*-------------------------------- Private methods ------------------------------------*/
 
+    private fun toJsonStringImpl(element: JsonElement): String {
+        val buffer = StringBuilder()
+        val jsonWriter = this.jsonWriter.get()
+        if (jsonWriter == null) {
+            if (element.isJsonNull())
+                return if (ignoreNull)
+                    ""
+                else "null"
+            writeJson(element, buffer)
+            return buffer.toString()
+        }
+        jsonWriter.apply(buffer)
+        jsonWriter.write(element)
+        return buffer.toString()
+    }
+
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun htmlTranslate(str: String): String {
+        val buffer = StringBuilder()
+        for (c in str)
+            buffer.append(htmlEscapes.getOrDefault(c, c))
+        return buffer.toString()
+    }
+
     private fun checkField(field: Field): Boolean {
         val modifiers = field.modifiers
+        if (JModifier.isStatic(modifiers) || JModifier.isTransient(modifiers))
+            return false
         if (modifiers > ignoredModifiers)
             return modifiers.modifier().containsAll(ignoredModifiers())
-        return !(JModifier.isStatic(modifiers) || JModifier.isTransient(modifiers))
+        return true
     }
 
     private fun writeJson(element: JsonElement, buffer: StringBuilder) {

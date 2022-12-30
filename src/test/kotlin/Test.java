@@ -1,15 +1,10 @@
-import top.kkoishi.json.JsonArray;
-import top.kkoishi.json.JsonElement;
-import top.kkoishi.json.JsonString;
-import top.kkoishi.json.Kson;
+import org.jetbrains.annotations.NotNull;
+import top.kkoishi.json.*;
 import top.kkoishi.json.annotation.DeserializationIgnored;
+import top.kkoishi.json.annotation.FactoryGetter;
 import top.kkoishi.json.annotation.FieldJsonName;
 import top.kkoishi.json.annotation.SerializationIgnored;
-import top.kkoishi.json.io.ArrayTypeParser;
-import top.kkoishi.json.io.BasicJsonWriter;
-import top.kkoishi.json.io.JsonReader;
-import top.kkoishi.json.io.JsonWriter;
-import top.kkoishi.json.io.MapTypeParser;
+import top.kkoishi.json.io.*;
 import top.kkoishi.json.parse.Factorys;
 import top.kkoishi.json.reflect.Type;
 import top.kkoishi.json.reflect.TypeResolver;
@@ -24,10 +19,17 @@ import static java.lang.System.out;
 
 public final class Test {
     public static void main (String[] args) throws Exception {
-        testRef();
+        //testRef();
         //testArrayRef();
         //testMapRef();
+        //testGetter();
         test();
+    }
+
+    private static void testGetter() {
+        KsonBuilder builder = new KsonBuilder();
+        Kson kson = builder.prettyFormat().create();
+        out.println((TestGetter) kson.fromJsonString(TestGetter.class, "{\"a\": 114, \"b\": []}"));
     }
 
     private static void test () throws Exception {
@@ -59,6 +61,12 @@ public final class Test {
         out.println(map);
         reader.close();
         ins.close();
+
+        // test KsonBuilder.
+        KsonBuilder builder = new KsonBuilder(test);
+        final var kson = builder.prettyFormat().create();
+        out.println(kson.toJson(testNode));
+        out.println(kson.toJson(arr));
     }
 
     private static void testMapRef () throws Exception {
@@ -102,6 +110,68 @@ public final class Test {
         out.println(elem.context);
         reader.close();
         ins.close();
+    }
+
+    @FactoryGetter(getterDescriptor = "getFactory()Ltop/kkoishi/json/io/TypeParserFactory;")
+    static class TestGetter {
+        int a;
+        String[] b;
+
+        public TestGetter (int a, String[] b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        @Override
+        public String toString () {
+            return "TestGetter{" +
+                    "a=" + a +
+                    ", b=" + Arrays.toString(b) +
+                    '}';
+        }
+
+        private static class TestTypeParser extends TypeParser<TestGetter> {
+            public TestTypeParser (@NotNull Type<TestGetter> type) {
+                super(type);
+            }
+
+            @Override
+            public TestGetter fromJson (@NotNull JsonElement json) {
+                assert json.isJsonObject();
+                final var obj = json.toJsonObject();
+                throw new IllegalArgumentException();
+            }
+
+            @NotNull
+            @Override
+            public JsonElement toJson (TestGetter testGetter) {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        private static TypeParserFactory getFactory () {
+            return new TypeParserFactory() {
+                @NotNull
+                @Override
+                public FieldTypeParserFactory fieldParser () {
+                    throw new IllegalArgumentException();
+                }
+
+                @NotNull
+                @Override
+                @SuppressWarnings("unchecked")
+                public <T> TypeParser<T> create (@NotNull Type<T> type) {
+                    if (type.rawType() == TestGetter.class)
+                        return (TypeParser<T>) new TestTypeParser((Type<TestGetter>) type);
+                    throw new IllegalArgumentException();
+                }
+            };
+        }
+
+        @org.junit.jupiter.api.Test
+        void annotationTest () {
+
+        }
     }
 
     static class Node {

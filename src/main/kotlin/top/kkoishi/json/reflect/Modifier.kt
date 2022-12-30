@@ -54,7 +54,6 @@ enum class Modifier(val value: Int) {
         }
     }
 
-
     override fun toString(): String {
         return name
     }
