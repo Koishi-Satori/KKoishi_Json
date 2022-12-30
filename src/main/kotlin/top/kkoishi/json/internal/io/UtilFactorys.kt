@@ -1,15 +1,17 @@
 package top.kkoishi.json.internal.io
 
-import top.kkoishi.json.internal.reflect.Reflection
 import top.kkoishi.json.internal.reflect.Reflection.isType
 import top.kkoishi.json.io.TypeParser
 import top.kkoishi.json.io.TypeParserFactory
 import top.kkoishi.json.reflect.Type
+import java.lang.reflect.Type as JType
 import java.util.*
 
 internal object UtilFactorys {
-    @JvmStatic
-    val DATE: TypeParserFactory = getFactory(Date::class.java, UtilParsers.DATE)
+    internal fun init(stored: MutableMap<JType, TypeParserFactory>) {
+        stored[Date::class.java] = getFactory(Date::class.java, UtilParsers.DATE)
+        stored[UUID::class.java] = getFactory(UUID::class.java, UtilParsers.UUID)
+    }
 
     @JvmStatic
     @Suppress("UNCHECKED_CAST")

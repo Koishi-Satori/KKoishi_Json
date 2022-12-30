@@ -39,7 +39,7 @@ class KsonBuilder private constructor(
         kson.htmlEscape,
         kson.ignoredModifiers().modifier()) {
         for ((key, factory) in (storedField[kson] as ThreadLocal<MutableMap<Type, TypeParserFactory>>).get()) {
-            if (!Reflection.isType(factory.javaClass, InternalParserFactory.Conditional::class.java))
+            if (!Reflection.isType(factory.javaClass, InternalParserFactory.InitFactory::class.java))
                 stored.add(key to factory)
         }
     }
@@ -124,6 +124,13 @@ class KsonBuilder private constructor(
     fun htmlEscape(): KsonBuilder {
         synchronized(LOCK) {
             this.htmlEscape = true
+            return this
+        }
+    }
+
+    fun register(type: Type, factory: TypeParserFactory): KsonBuilder {
+        synchronized(LOCK) {
+            stored.add(type to factory)
             return this
         }
     }

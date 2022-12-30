@@ -15,6 +15,10 @@ object Factorys {
     @JvmStatic
     private val stored: MutableMap<JType, TypeParserFactory> = mutableMapOf()
 
+    init {
+        UtilFactorys.init(stored)
+    }
+
     @JvmStatic
     @JvmName(" addType")
     internal fun addType(type: JType, factory: TypeParserFactory) {

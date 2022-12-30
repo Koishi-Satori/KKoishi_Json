@@ -448,6 +448,13 @@ class Kson {
 
     /*-------------------------------- Public methods ------------------------------------*/
 
+    /**
+     * Serialize generic class instances to JsonElement.
+     *
+     * @param typeResolver the TypeResolver used to get generic parameters. Do not create a class implement this.
+     * @param instance the instance of generic class.
+     * @return a JsonElement.
+     */
     @Suppress("UNCHECKED_CAST")
     fun <T> toJson(typeResolver: TypeResolver<T?>, instance: T?): JsonElement where T : Any {
         if (instance == null)

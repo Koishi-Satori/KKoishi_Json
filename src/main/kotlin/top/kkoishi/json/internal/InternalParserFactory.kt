@@ -15,6 +15,8 @@ internal object InternalParserFactory {
         val instance: Kson
     }
 
+    internal interface InitFactory
+
     @JvmStatic
     @Suppress("UNCHECKED_CAST")
     internal fun getFactory(require: Class<*>, inst: TypeParser<*>): Pair<JType, TypeParserFactory> {
@@ -27,7 +29,7 @@ internal object InternalParserFactory {
         })
     }
 
-    class DateParser(override val instance: Kson) : UtilParsers.DateTypeParser(), Conditional {
+    class DateParser(override val instance: Kson) : UtilParsers.DateTypeParser(), Conditional, InitFactory {
         override fun fromJson(json: JsonElement): Date =
             super.fromJson(json, instance.dateStyle, instance.timeStyle, instance.locale)
 

@@ -1,6 +1,7 @@
 package top.kkoishi.json.internal.io
 
 import top.kkoishi.json.*
+import top.kkoishi.json.internal.InternalParserFactory
 import top.kkoishi.json.io.TypeParser
 import top.kkoishi.json.reflect.Type
 import top.kkoishi.json.reflect.TypeHelper.asType
@@ -86,6 +87,21 @@ internal object UtilParsers {
 
     @JvmStatic
     internal val DATE: TypeParser<Date> = DateTypeParser()
+
+    @JvmStatic
+    internal val UUID: TypeParser<UUID> = object : TypeParser<UUID>(Type(java.util.UUID::class.java)), InternalParserFactory.InitFactory {
+        override fun fromJson(json: JsonElement): UUID {
+            if (json.isJsonPrimitive()) {
+                val primitive = json.toJsonPrimitive()
+                if (primitive.isJsonString()) {
+                    return java.util.UUID.fromString(primitive.getAsString())
+                }
+            }
+            throw IllegalArgumentException("Required JsonString to serialize to UUID")
+        }
+
+        override fun toJson(t: UUID): JsonElement = JsonString(t.toString())
+    }
 
     @JvmStatic
     private val INT: TypeParser<Any> = object : PrimitiveTypeParser(Type<Any>(Int::class.java)) {
