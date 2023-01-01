@@ -12,6 +12,13 @@ import java.lang.reflect.Type
 import java.util.*
 import kotlin.jvm.Throws
 
+/**
+ * An util class used to access some methods in sun.misc.Unsafe and get the [TypeParserFactory]
+ * of some basic classes.
+ *
+ * Some JVM environment might lack of [jdk.unsupported] module, so the methods are acquired by
+ * reflection.
+ */
 internal object Utils {
     internal fun KKoishiJsonInit(inst: Kson): List<Pair<Type, TypeParserFactory>> {
         // TODO: init some basic classes.

@@ -55,7 +55,7 @@ object Factorys {
         if (type.isArray)
             return getArrayTypeFactory()
         else if (Reflection.isMap(type) || Reflection.isCollection(type))
-            throw IllegalArgumentException()
+            throw IllegalArgumentException("Please use getMapTypeFactory/getCollectionTypeFactory instead of this to get TypeParserFactory of map/collection")
         else if (Reflection.checkJsonPrimitive(type))
             return UtilFactorys.PRIMITIVE
         else
@@ -102,13 +102,13 @@ object Factorys {
                 return getFactoryFromClass(tp.rawType())
             }
         }
-        throw IllegalStateException()
+        throw IllegalStateException("Can not get the parser of $type")
     }
 
     fun <TYPE> getFactory(typeResolver: TypeResolver<TYPE>): TypeParserFactory {
         val type = typeResolver.resolve()
         if (type !is ParameterizedType)
-            throw IllegalStateException()
+            throw IllegalStateException("Can not get Parameters, please make sure that you fill in the complete generic parameters")
         val arguments = type.actualTypeArguments
         val key = Reflection.ParameterizedTypeImpl(type.ownerType, type.rawType, *arguments)
         if (stored.containsKey(key)) {

@@ -1,5 +1,8 @@
 package top.kkoishi.json
 
+/**
+ * A JsonObject contains key-value entries.
+ */
 class JsonObject : JsonElement, Iterable<Pair<String, JsonElement>> {
     private val content: MutableMap<String, JsonElement>
 

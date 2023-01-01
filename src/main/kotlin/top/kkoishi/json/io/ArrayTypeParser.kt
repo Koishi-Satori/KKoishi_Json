@@ -67,7 +67,7 @@ class ArrayTypeParser<T> private constructor(type: Type<T>) : TypeParser<T>(type
 
     private fun wrap(v: Any?): JsonElement {
         if (v == null)
-            return JsonNull()
+            return JsonNull.INSTANCE
         val clz = v.javaClass
         if (clz.isArray)
             return Factorys.getArrayTypeFactory().create<Any>(Type(clz)).toJson(v)

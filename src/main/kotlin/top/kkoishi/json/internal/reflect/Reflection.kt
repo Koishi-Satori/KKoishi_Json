@@ -349,7 +349,7 @@ internal object Reflection {
                 assert(upper.size == 1)
                 return getRawType(upper[0])
             }
-            else -> throw IllegalArgumentException()
+            else -> throw IllegalArgumentException("Unsupported type: $type")
         }
     }
 

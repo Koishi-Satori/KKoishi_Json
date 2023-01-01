@@ -75,7 +75,7 @@ internal object UtilParsers {
                 }
                 return primitive.getAsAny()
             }
-            throw IllegalArgumentException()
+            throw IllegalArgumentException("JsonElement $json is not JsonPrimitive instance")
         }
 
         override fun toJson(t: Any): JsonElement = JsonPrimitive.createActual(t)
@@ -89,7 +89,7 @@ internal object UtilParsers {
     internal val DATE: TypeParser<Date> = DateTypeParser()
 
     @JvmStatic
-    internal val UUID: TypeParser<UUID> = object : TypeParser<UUID>(Type(java.util.UUID::class.java)), InternalParserFactory.InitFactory {
+    internal val UUID: TypeParser<UUID> = object : TypeParser<UUID>(Type(java.util.UUID::class.java)) {
         override fun fromJson(json: JsonElement): UUID {
             if (json.isJsonPrimitive()) {
                 val primitive = json.toJsonPrimitive()
@@ -102,6 +102,8 @@ internal object UtilParsers {
 
         override fun toJson(t: UUID): JsonElement = JsonString(t.toString())
     }
+
+    /*----------------------------- Primitive Parsers -----------------------------*/
 
     @JvmStatic
     private val INT: TypeParser<Any> = object : PrimitiveTypeParser(Type<Any>(Int::class.java)) {

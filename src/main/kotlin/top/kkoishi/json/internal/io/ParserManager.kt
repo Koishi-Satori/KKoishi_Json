@@ -51,7 +51,7 @@ internal object ParserManager {
                 return Factorys.getFactoryFromClass(tp.rawType()).create(tp)
             }
         }
-        throw IllegalStateException()
+        throw IllegalStateException("Can not get the parser of $type")
     }
 
     @JvmStatic

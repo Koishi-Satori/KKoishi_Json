@@ -94,6 +94,10 @@ import java.lang.reflect.Type as JType
  * Interfaces:
  * [top.kkoishi.json.reflect.TypeHelper.TypeParserFactoryGetter]: This is used to get TypeParserFactory.
  *
+ * The default constructor will try to use sun.misc.Unsafe to allocate instance and fill the fields in specific class.
+ * And it provides another two constructors, which allows you to customize whether it use sun.misc.Unsafe for
+ * serialization/deserialization and register some initial TypeParserFactories.
+ *
  * @author KKoishi_
  * @see TypeParser
  * @see TypeResolver
@@ -118,7 +122,7 @@ class Kson {
 
     @JvmOverloads
     constructor(
-        useUnsafe: Boolean,
+        useUnsafe: Boolean = DEFAULT_USE_UNSAFE,
         initFactories: List<Pair<JType, TypeParserFactory>> = listOf(),
     ) : this(DEFAULT_DATE_STYLE,
         DEFAULT_TIME_STYLE,
@@ -127,8 +131,7 @@ class Kson {
         DEFAULT_IGNORE_NULL,
         initFactories)
 
-    @JvmOverloads
-    constructor(
+    private constructor(
         dateStyle: Int = DEFAULT_DATE_STYLE,
         timeStyle: Int = DEFAULT_TIME_STYLE,
         locale: Locale = DEFAULT_LOCALE,
@@ -372,7 +375,7 @@ class Kson {
         private open class InternalFieldTypeParser<T : Any>(type: Type<T>, override val instance: Kson) :
             FieldTypeParser<T>(type), InternalParserFactory.Conditional {
             override fun getParser(type: java.lang.reflect.Type): TypeParser<*> =
-                instance.getParser(type) ?: throw IllegalStateException()
+                instance.getParser(type) ?: throw IllegalStateException("Can not get the parser of $type")
 
             override fun deserializeAllFields(o: JsonObject): ArrayDeque<FieldData> {
                 val declaredFields = type.rawType().declaredFields
@@ -458,10 +461,10 @@ class Kson {
     @Suppress("UNCHECKED_CAST")
     fun <T> toJson(typeResolver: TypeResolver<T?>, instance: T?): JsonElement where T : Any {
         if (instance == null)
-            return JsonNull()
+            return JsonNull.INSTANCE
         val type = typeResolver.resolve()
         if (type !is ParameterizedType)
-            throw IllegalStateException()
+            throw IllegalStateException("Can not get Parameters, please make sure that you fill in the complete generic parameters")
 
         val factory = getFactory(type)
         if (factory != null) {
@@ -473,13 +476,20 @@ class Kson {
         return parser.toJson(instance)
     }
 
+    /**
+     * Deserialize generic class instances to JsonElement.
+     *
+     * @param typeResolver the TypeResolver used to get generic parameters. Do not create a class implement this.
+     * @param json the JsonElement used for deserialization.
+     * @return a instace of T.
+     */
     @Suppress("UNCHECKED_CAST")
     fun <T> fromJson(typeResolver: TypeResolver<T?>, json: JsonElement): T? where T : Any {
         if (json.isJsonNull())
             return null
         val type = typeResolver.resolve()
         if (type !is ParameterizedType)
-            throw IllegalStateException()
+            throw IllegalStateException("Can not get Parameters, please make sure that you fill in the complete generic parameters")
         val parameters = type.actualTypeArguments
         val raw: Class<T> = Reflection.getRawType(type.rawType) as Class<T>
 
@@ -489,7 +499,7 @@ class Kson {
             return factory.create(tp).fromJson(json)
         }
 
-        val parser = getParser(type) ?: throw UnsupportedException()
+        val parser = getParser(type) ?: throw UnsupportedException("Can not get the parser of $type")
         val result = parser.fromJson(json)
         if (parser is CollectionTypeParser<*>) {
             val collection = Allocators.unsafe<T>(useUnsafe).allocateInstance(raw)
@@ -521,6 +531,13 @@ class Kson {
         return result as T
     }
 
+    /**
+     * This method deserializes the json element to the instance of given type.
+     *
+     * @param typeofT the type of T.
+     * @param json the json element.
+     * @return a instance.
+     */
     @Suppress("UNCHECKED_CAST")
     fun <T> fromJson(typeofT: JType, json: JsonElement): T? {
         if (json.isJsonNull())
@@ -532,21 +549,30 @@ class Kson {
                 if (primitive.isJsonString())
                     return primitive.getAsString() as T?
             }
-            throw IllegalArgumentException()
+            throw IllegalArgumentException("Can not get the parser of $typeofT")
         }
         return parser.fromJson(json) as T?
     }
 
+    /**
+     * This method serializes the specified object into its equivalent JsonElement.
+     * If the specified object is not a generic type, you just need to fill in its Class.
+     * For generic type, you need to fill in a [ParameterizedType] instance.
+     *
+     * @param typeofT the type of instance.
+     * @param instance the specified instance.
+     * @return a JsonElement
+     */
     @Suppress("UNCHECKED_CAST")
     fun <T> toJson(typeofT: JType, instance: T?): JsonElement {
         if (instance == null)
-            return JsonNull()
+            return JsonNull.INSTANCE
         val parser = getParser(typeofT) as TypeParser<in T>?
         if (parser == null) {
             if (typeofT == String::class.java && instance is String) {
                 return JsonString(instance)
             }
-            throw IllegalArgumentException()
+            throw IllegalArgumentException("Can not get the parser of $typeofT")
         }
         return parser.toJson(instance)
     }
@@ -563,28 +589,62 @@ class Kson {
 
     fun <T> fromJsonString(typeofT: JType, json: String): T? = fromJson(typeofT, fromJsonString(json))
 
+    /**
+     * Get a json reader.
+     *
+     * @param reader a Reader instance.
+     * @return a JsonReader.
+     */
     fun reader(
         reader: Reader,
     ): JsonReader = JsonReader(reader, platform, mode)
 
+    /**
+     * Get a json writer.
+     *
+     * @param writer a java.io.Writer instance
+     * @param lineSeparator the line separator.
+     * @return a JsonWriter.
+     */
     @JvmOverloads
     fun writer(writer: java.io.Writer, lineSeparator: String = "\n"): JsonWriter {
         return BasicJsonWriter(writer, lineSeparator)
     }
 
-    fun ignoredModifiers(): MutableList<Modifier> = ignoredModifiers.modifier()
-
-    fun setIgnoredModifiers(ignoredModifiers: List<Modifier>): Kson {
-        this.ignoredModifiers = ignoredModifiers.modifier()
-        return this
+    /**
+     * Get the ignored modifiers.
+     *
+     * @return a list of ignored modifiers.
+     */
+    fun ignoredModifiers(): MutableList<Modifier> {
+        if (ignoredModifiers == 0)
+            return Modifier.STATIC.value.modifier()
+        return ignoredModifiers.modifier()
     }
 
+    /** This method serializes the specified object into its equivalent Json string.
+     * This method should be used when the specified object is not a generic type.
+     *
+     * This method uses getClass to get the type for the specified object, but this will cause the loss of
+     * generic information because of the Type Erasure of JVM. You must use the methods with TypeResolver
+     * as its parameter, or fill in ParameterizedType when using the methods with [JType] as its parameter.
+     *
+     * @param instance the instance of T
+     * @return the equivalent Json string of the given instance.
+     */
     fun <T> toJson(instance: T?): String {
         if (instance == null) {
             return if (ignoreNull) "" else "null"
         }
         return toJsonString(instance.javaClass, instance)
     }
+
+    /**
+     * Get a kson builder which use the properties of this.
+     *
+     * @return a KsonBuiler instance.
+     */
+    fun builder(): KsonBuilder = KsonBuilder(this)
 
     /*-------------------------------- Private methods ------------------------------------*/
 
@@ -743,7 +803,7 @@ class Kson {
         if (type.isArray)
             return Factorys.getArrayTypeFactory()
         else if (Reflection.isMap(type) || Reflection.isCollection(type))
-            throw IllegalArgumentException()
+            throw IllegalArgumentException("Can not get the parser of $type")
         else if (Reflection.checkJsonPrimitive(type))
             return UtilFactorys.PRIMITIVE
         else

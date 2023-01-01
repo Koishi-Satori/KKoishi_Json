@@ -107,7 +107,7 @@ class JsonArray : JsonElement, Iterable<JsonElement> {
                 assert(dv > 0) { throw IllegalArgumentException() }
                 val old = elements
                 val oldSize = old.size
-                elements = Array(oldSize + dv * (if (desize) -1 else 1)) { if (it < oldSize) old[it] else JsonNull() }
+                elements = Array(oldSize + dv * (if (desize) -1 else 1)) { if (it < oldSize) old[it] else JsonNull.INSTANCE }
                 return this
             }
 
@@ -129,7 +129,7 @@ class JsonArray : JsonElement, Iterable<JsonElement> {
             }
 
             override fun clear() {
-                elements = Array(0) { JsonNull() }
+                elements = Array(0) { JsonNull.INSTANCE }
             }
 
             override fun listIterator(): MutableListIterator<JsonElement> = ArrIterator(this)

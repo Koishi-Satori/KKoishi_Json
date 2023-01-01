@@ -42,7 +42,7 @@ abstract class JsonParser internal constructor(iterator: Iterator<Char>, platfor
             Type.BLANKET_BEGIN -> jsonObject()
             Type.ARRAY_BLANKET_BEGIN -> jsonArray()
             Type.NUMBER -> judgeNumber(token.content)
-            Type.NULL -> JsonNull()
+            Type.NULL -> JsonNull.INSTANCE
             Type.BOOL -> JsonBool(token.content.isEmpty())
             else -> throw JsonSyntaxException("The json element start token $token is invalid")
         }
@@ -78,7 +78,7 @@ abstract class JsonParser internal constructor(iterator: Iterator<Char>, platfor
             Type.BLANKET_BEGIN -> jsonObject()
             Type.ARRAY_BLANKET_BEGIN -> jsonArray()
             Type.NUMBER -> judgeNumber(last.content)
-            Type.NULL -> JsonNull()
+            Type.NULL -> JsonNull.INSTANCE
             Type.BOOL -> JsonBool(last.content.isEmpty())
             else -> throw JsonSyntaxException("The json element start token $last is invalid")
         }

@@ -101,7 +101,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
             if (field.getAnnotation(DeserializationIgnored::class.java) != null)
                 later.addLast(field)
             else {
-                val fieldValue = if (obj.contains(name)) obj[name]!! else JsonNull()
+                val fieldValue = if (obj.contains(name)) obj[name]!! else JsonNull.INSTANCE
                 unsafeSetValue(instance,
                     field,
                     initializedValue(field),
@@ -265,7 +265,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
     @Suppress("UNCHECKED_CAST")
     protected fun wrap(v: Any?, type: JType): JsonElement {
         if (v == null)
-            return JsonNull()
+            return JsonNull.INSTANCE
         val parser: TypeParser<in Any> = getParser(type) as TypeParser<in Any>
         return parser.toJson(v)
     }
@@ -308,7 +308,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
                         later.addLast(field)
                     else {
                         field.isAccessible = true
-                        val fieldValue = if (obj.contains(name)) obj[name]!! else JsonNull()
+                        val fieldValue = if (obj.contains(name)) obj[name]!! else JsonNull.INSTANCE
                         field[instance] = unwrap(fieldValue, field.type)
                     }
                 }

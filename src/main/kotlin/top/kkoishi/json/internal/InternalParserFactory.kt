@@ -11,16 +11,27 @@ import java.util.*
 import java.lang.reflect.Type as JType
 
 internal object InternalParserFactory {
+    /**
+     * Some internal parser/factory might use some properties in Kson, so they need to implement
+     * this interface to get Kson instance.
+     */
     internal interface Conditional {
         val instance: Kson
     }
 
+    /**
+     * This interface is used to avoid repeated initialization when construct KsonBuilder
+     * instance using Kson instance.
+     *
+     * @see top.kkoishi.json.KsonBuilder
+     */
     internal interface InitFactory
 
     @JvmStatic
     @Suppress("UNCHECKED_CAST")
     internal fun getFactory(require: Class<*>, inst: TypeParser<*>): Pair<JType, TypeParserFactory> {
-        return (require to object : TypeParserFactory {
+        // get anonymous class implements InitFactory and extends TypeParserFactory.
+        return (require to object : TypeParserFactory, InitFactory {
             override fun <T : Any> create(type: Type<T>): TypeParser<T> {
                 if (Reflection.isType(type, require))
                     return inst as TypeParser<T>
@@ -29,7 +40,7 @@ internal object InternalParserFactory {
         })
     }
 
-    class DateParser(override val instance: Kson) : UtilParsers.DateTypeParser(), Conditional, InitFactory {
+    class DateParser(override val instance: Kson) : UtilParsers.DateTypeParser(), Conditional {
         override fun fromJson(json: JsonElement): Date =
             super.fromJson(json, instance.dateStyle, instance.timeStyle, instance.locale)
 
