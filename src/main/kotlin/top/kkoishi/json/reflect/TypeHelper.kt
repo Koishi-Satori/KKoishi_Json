@@ -6,7 +6,7 @@ import kotlin.reflect.KClass
 object TypeHelper {
     interface TypeToken<T> {
         fun type(): java.lang.reflect.Type
-        fun rawType(): Class<in T>
+        fun rawType(): Class<out T>
     }
 
     interface TypeParserFactoryGetter {

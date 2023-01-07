@@ -50,14 +50,16 @@ internal object Allocators {
         }
 
         try {
-            val getConstructorId = ObjectStreamClass::class.java.getDeclaredMethod("getConstructorId", Class::class.java)
+            val getConstructorId =
+                ObjectStreamClass::class.java.getDeclaredMethod("getConstructorId", Class::class.java)
             getConstructorId.isAccessible = true
             val id = getConstructorId(null, Any::class.java) as Int
-            val newInstance = ObjectInputStream::class.java.getDeclaredMethod("newInstance", Class::class.java, Integer.TYPE)
+            val newInstance =
+                ObjectInputStream::class.java.getDeclaredMethod("newInstance", Class::class.java, Integer.TYPE)
             newInstance.isAccessible = true
             return object : InstanceAllocator<Any> {
                 override fun allocateInstance(typeofT: Type<Any>): Any {
-                    with (typeofT.rawType()) {
+                    with(typeofT.rawType()) {
                         checkInstantiable(this)
                         return newInstance(null, this, id)
                     }
@@ -104,14 +106,16 @@ internal object Allocators {
         }
 
         try {
-            val getConstructorId = ObjectStreamClass::class.java.getDeclaredMethod("getConstructorId", Class::class.java)
+            val getConstructorId =
+                ObjectStreamClass::class.java.getDeclaredMethod("getConstructorId", Class::class.java)
             getConstructorId.isAccessible = true
             val id = getConstructorId(null, Any::class.java) as Int
-            val newInstance = ObjectInputStream::class.java.getDeclaredMethod("newInstance", Class::class.java, Integer.TYPE)
+            val newInstance =
+                ObjectInputStream::class.java.getDeclaredMethod("newInstance", Class::class.java, Integer.TYPE)
             newInstance.isAccessible = true
             return object : InstanceAllocator<T> {
                 override fun allocateInstance(typeofT: Type<T>): T {
-                    with (typeofT.rawType()) {
+                    with(typeofT.rawType()) {
                         checkInstantiable(this)
                         return newInstance(null, this, id) as T
                     }

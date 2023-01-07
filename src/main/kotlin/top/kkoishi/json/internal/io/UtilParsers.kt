@@ -1,14 +1,16 @@
 package top.kkoishi.json.internal.io
 
 import top.kkoishi.json.*
-import top.kkoishi.json.internal.InternalParserFactory
+import top.kkoishi.json.internal.reflect.Allocators
 import top.kkoishi.json.io.TypeParser
 import top.kkoishi.json.reflect.Type
 import top.kkoishi.json.reflect.TypeHelper.asType
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.text.DateFormat
+import java.time.ZoneId
 import java.util.*
+import java.lang.reflect.Type as JType
 import kotlin.reflect.KClass
 
 internal object UtilParsers {
@@ -86,6 +88,14 @@ internal object UtilParsers {
         throw IllegalArgumentException("The input JsonElement must be ${type.simpleName}")
 
     @JvmStatic
+    @Suppress("NOTHING_TO_INLINE")
+    private inline fun getArray(json: JsonElement, target: String): JsonArray {
+        if (json.isJsonArray())
+            return json.toJsonArray()
+        throw IllegalArgumentException("Required JsonArray to serialize to $target")
+    }
+
+    @JvmStatic
     internal val DATE: TypeParser<Date> = DateTypeParser()
 
     @JvmStatic
@@ -102,6 +112,64 @@ internal object UtilParsers {
 
         override fun toJson(t: UUID): JsonElement = JsonString(t.toString())
     }
+
+    @JvmStatic
+    internal val BITSET: TypeParser<BitSet> = object : TypeParser<BitSet>(Type(BitSet::class.java)) {
+        override fun fromJson(json: JsonElement): BitSet = with(getArray(json, "BitSet")) {
+            return BitSet.valueOf(LongArray(this.size()) { index ->
+                this[index].toJsonPrimitive().getAsNumber().toLong()
+            })
+        }
+
+        override fun toJson(t: BitSet): JsonElement {
+            val arr = JsonArray()
+            Arrays.stream(t.toLongArray()).forEach { arr.add(JsonLong(it)) }
+            return arr
+        }
+    }
+
+    @JvmStatic
+    internal val CALENDER: TypeParser<Calendar> = object : TypeParser<Calendar>(Type(Calendar::class.java)) {
+        override fun fromJson(json: JsonElement): Calendar {
+            if (json.isJsonPrimitive()) {
+                val primitive = json.toJsonPrimitive()
+                if (primitive.isJsonString())
+                    return Calendar.getInstance(TimeZone.getTimeZone(primitive.getAsString()))
+            }
+            throw IllegalArgumentException("Required JsonString to serialize to Calender")
+        }
+
+        override fun toJson(t: Calendar): JsonElement = JsonString(t.timeZone.toZoneId().toString())
+    }
+
+    @JvmStatic
+    internal val TIME_ZONE: TypeParser<TimeZone> = object : TypeParser<TimeZone>(Type(TimeZone::class.java)) {
+        override fun fromJson(json: JsonElement): TimeZone {
+            if (json.isJsonPrimitive()) {
+                val primitive = json.toJsonPrimitive()
+                if (primitive.isJsonString())
+                    return TimeZone.getTimeZone(primitive.getAsString())
+            }
+            throw IllegalArgumentException("Required JsonString to serialize to TimeZone")
+        }
+
+        override fun toJson(t: TimeZone): JsonElement = JsonString(t.toZoneId().toString())
+    }
+
+    @JvmStatic
+    internal val ZONE_ID: TypeParser<ZoneId> = object : TypeParser<ZoneId>(Type(ZoneId::class.java)) {
+        override fun fromJson(json: JsonElement): ZoneId {
+            if (json.isJsonPrimitive()) {
+                val primitive = json.toJsonPrimitive()
+                if (primitive.isJsonString())
+                    return ZoneId.of(primitive.getAsString())
+            }
+            throw IllegalArgumentException("Required JsonString to serialize to ZoneId")
+        }
+
+        override fun toJson(t: ZoneId): JsonElement = JsonString(t.toString())
+    }
+
 
     /*----------------------------- Primitive Parsers -----------------------------*/
 

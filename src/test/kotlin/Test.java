@@ -10,10 +10,7 @@ import top.kkoishi.json.reflect.Type;
 import top.kkoishi.json.reflect.TypeResolver;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import static java.lang.System.out;
 
@@ -24,6 +21,7 @@ public final class Test {
         //testMapRef();
         //testGetter();
         test();
+        //out.println(Factorys.getFactory(Calendar.class).create(new Type(Calendar.class)));
     }
 
     private static void testGetter() {

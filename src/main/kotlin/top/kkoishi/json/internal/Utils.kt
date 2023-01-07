@@ -1,14 +1,19 @@
 package top.kkoishi.json.internal
 
+import top.kkoishi.json.JsonElement
+import top.kkoishi.json.JsonString
 import top.kkoishi.json.Kson
 import top.kkoishi.json.exceptions.UnsupportedException
 import top.kkoishi.json.internal.InternalParserFactory.DateParser
 import top.kkoishi.json.internal.InternalParserFactory.getFactory
 import top.kkoishi.json.internal.io.UtilParsers
+import top.kkoishi.json.internal.reflect.Reflection
+import top.kkoishi.json.io.TypeParser
 import top.kkoishi.json.io.TypeParserFactory
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Type
+import java.time.ZoneId
 import java.util.*
 import kotlin.jvm.Throws
 
@@ -20,9 +25,32 @@ import kotlin.jvm.Throws
  * reflection.
  */
 internal object Utils {
+    @JvmStatic
     internal fun KKoishiJsonInit(inst: Kson): List<Pair<Type, TypeParserFactory>> {
         // TODO: init some basic classes.
-        return listOf(getFactory(Date::class.java, DateParser(inst)), getFactory(UUID::class.java, UtilParsers.UUID))
+        return listOf(getFactory(Date::class.java, DateParser(inst)),
+            getFactory(UUID::class.java, UtilParsers.UUID),
+            getFactory(Calendar::class.java,
+                object : TypeParser<Calendar>(top.kkoishi.json.reflect.Type(Calendar::class.java)),
+                    InternalParserFactory.Conditional {
+                    override fun fromJson(json: JsonElement): Calendar {
+                        if (json.isJsonPrimitive()) {
+                            val primitive = json.toJsonPrimitive()
+                            if (primitive.isJsonString())
+                                return Calendar.getInstance(TimeZone.getTimeZone(primitive.getAsString()),
+                                    instance.locale)
+                        }
+                        throw IllegalArgumentException("Required JsonString to serialize to Calender")
+                    }
+
+                    override fun toJson(t: Calendar): JsonElement = JsonString(t.timeZone.toZoneId().toString())
+                    override val instance: Kson
+                        get() = inst
+                }),
+            getFactory(BitSet::class.java, UtilParsers.BITSET),
+            getFactory(TimeZone::class.java, UtilParsers.TIME_ZONE),
+            getFactory(ZoneId::class.java, UtilParsers.ZONE_ID),
+        )
     }
 
     @JvmStatic
@@ -152,7 +180,7 @@ internal object Utils {
         }
         return null
     }
-    
+
     @JvmStatic
     private val unsafeClass: Class<*>? = accessUnsafeClass()
 
@@ -200,7 +228,7 @@ internal object Utils {
 
     @JvmStatic
     private val getBoolean = accessGetValue("Boolean")
-    
+
     @JvmStatic
     internal val unsafe: Any? = accessUnsafe()
 

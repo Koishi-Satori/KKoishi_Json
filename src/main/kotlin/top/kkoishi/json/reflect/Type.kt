@@ -6,17 +6,17 @@ import java.lang.reflect.Type
 
 class Type<T> : TypeHelper.TypeToken<T>, TypeResolver<T> {
     private val type: Type
-    private val rawType: Class<in T>
+    private val rawType: Class<out T>
     private val hashcode: Int
 
-    private constructor(type: Type, rawType: Class<in T>) {
+    private constructor(type: Type, rawType: Class<out T>) {
         this.type = type
         this.rawType = rawType
         hashcode = this.type.hashCode()
     }
 
     @Suppress("UNCHECKED_CAST")
-    constructor(type: Type) : this(Reflection.ensureCanonical(type), Reflection.getRawType(type) as Class<in T>)
+    constructor(type: Type) : this(Reflection.ensureCanonical(type), Reflection.getRawType(type) as Class<out T>)
 
     @Suppress("UNCHECKED_CAST")
     constructor(clz: Class<in T>) {
@@ -30,7 +30,7 @@ class Type<T> : TypeHelper.TypeToken<T>, TypeResolver<T> {
         } else {
             type = Reflection.canonicalize(clz)
         }
-        rawType = Reflection.getRawType(type) as Class<in T>
+        rawType = Reflection.getRawType(type) as Class<out T>
         hashcode = type.hashCode()
     }
 

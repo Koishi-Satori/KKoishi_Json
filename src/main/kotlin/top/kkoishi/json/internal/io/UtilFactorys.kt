@@ -11,6 +11,7 @@ internal object UtilFactorys {
     internal fun init(stored: MutableMap<JType, TypeParserFactory>) {
         stored[Date::class.java] = getFactory(Date::class.java, UtilParsers.DATE)
         stored[UUID::class.java] = getFactory(UUID::class.java, UtilParsers.UUID)
+        stored[Calendar::class.java] = getFactory(Calendar::class.java, UtilParsers.CALENDER)
     }
 
     @JvmStatic

@@ -21,6 +21,7 @@ import java.lang.reflect.Field
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
+import java.sql.Ref
 import java.lang.reflect.Modifier as JModifier
 import java.util.*
 import kotlin.collections.ArrayDeque
@@ -115,6 +116,8 @@ class Kson {
     private val mode: NumberMode
     private val stored: ThreadLocal<MutableMap<JType, TypeParserFactory>> = ThreadLocal()
     private var fieldParserFactory: InternalFieldParserFactory
+    private var mapParserFactory: MapTypeParserFactory
+    private var collectionParserFactory: CollectionTypeParserFactory
     private var ignoredModifiers: Int = 0x0000
     private val jsonWriter: ThreadLocal<Writer?> = ThreadLocal()
 
@@ -178,6 +181,8 @@ class Kson {
         }
 
         fieldParserFactory = InternalFieldParserFactory(this)
+        mapParserFactory = MapTypeParserFactory()
+        collectionParserFactory = CollectionTypeParserFactory()
         for ((tp, factory) in KKoishiJsonInit(this)) {
             val value = stored[tp]
             if (value == null)
@@ -200,6 +205,9 @@ class Kson {
         private const val DEFAULT_USE_UNSAFE = true
         private const val DEFAULT_IGNORE_NULL = false
         private const val DEFAULT_HTML_ESCAPE = false
+
+        @JvmStatic
+        private val OBJECT_TWO_PARAMETERS: Array<JType> = arrayOf(Any::class.java, Any::class.java)
 
         @JvmStatic
         private val htmlEscapes =
@@ -447,6 +455,45 @@ class Kson {
                 return allocator.allocateInstance(clz as Class<Any>)
             }
         }
+
+        private class MapTypeParserFactory {
+            private val instances = HashMap<ParameterizedType, MapTypeParser<*, *>>()
+
+            @Suppress("UNCHECKED_CAST")
+            fun <K, V> create(
+                kType: JType,
+                vType: JType,
+                rawType: JType = MutableMap::class.java,
+                ownerType: JType? = null,
+            ): MapTypeParser<K, V> where K : Any, V : Any {
+                val key = Reflection.ParameterizedTypeImpl(null, rawType, kType, vType)
+                var inst: MapTypeParser<K, V>? = instances[key] as MapTypeParser<K, V>?
+                if (inst == null) {
+                    inst = MapTypeParser.` getInstance`(Type(MutableMap::class.java), kType, vType)
+                    instances[key] = inst
+                }
+                return inst
+            }
+        }
+
+        private class CollectionTypeParserFactory {
+            private val instances = HashMap<ParameterizedType, CollectionTypeParser<*>>()
+
+            @Suppress("UNCHECKED_CAST")
+            fun <T> create(
+                tType: JType,
+                rawType: JType = Collection::class.java,
+                ownerType: JType? = null,
+            ): CollectionTypeParser<T> where T : Any {
+                val key = Reflection.ParameterizedTypeImpl(ownerType, rawType, tType)
+                var inst: CollectionTypeParser<T>? = instances[key] as CollectionTypeParser<T>?
+                if (inst == null) {
+                    inst = CollectionTypeParser.` getInstance`(Type(Collection::class.java), tType)
+                    instances[key] = inst
+                }
+                return inst
+            }
+        }
     }
 
     /*-------------------------------- Public methods ------------------------------------*/
@@ -481,7 +528,7 @@ class Kson {
      *
      * @param typeResolver the TypeResolver used to get generic parameters. Do not create a class implement this.
      * @param json the JsonElement used for deserialization.
-     * @return a instace of T.
+     * @return an instance of T.
      */
     @Suppress("UNCHECKED_CAST")
     fun <T> fromJson(typeResolver: TypeResolver<T?>, json: JsonElement): T? where T : Any {
@@ -490,7 +537,6 @@ class Kson {
         val type = typeResolver.resolve()
         if (type !is ParameterizedType)
             throw IllegalStateException("Can not get Parameters, please make sure that you fill in the complete generic parameters")
-        val parameters = type.actualTypeArguments
         val raw: Class<T> = Reflection.getRawType(type.rawType) as Class<T>
 
         val factory = getFactory(type)
@@ -502,7 +548,13 @@ class Kson {
         val parser = getParser(type) ?: throw UnsupportedException("Can not get the parser of $type")
         val result = parser.fromJson(json)
         if (parser is CollectionTypeParser<*>) {
-            val collection = Allocators.unsafe<T>(useUnsafe).allocateInstance(raw)
+            val collection: T = try {
+                val constructor = raw.getDeclaredConstructor()
+                constructor.isAccessible = true
+                constructor.newInstance()
+            } catch (e: Exception) {
+                Allocators.unsafe<T>(useUnsafe).allocateInstance(raw)
+            }
             val add: Method
             try {
                 add = Reflection.getMethod(collection.javaClass, "add", Any::class.java)
@@ -516,7 +568,13 @@ class Kson {
         }
 
         if (parser is MapTypeParser<*, *>) {
-            val map = Allocators.unsafe<T>(useUnsafe).allocateInstance(raw)
+            val map: T = try {
+                val constructor = raw.getDeclaredConstructor()
+                constructor.isAccessible = true
+                constructor.newInstance()
+            } catch (e: Exception) {
+                Allocators.unsafe<T>(useUnsafe).allocateInstance(raw)
+            }
             val put: Method
             try {
                 put = Reflection.getMethod(map.javaClass, "put", Any::class.java, Any::class.java)
@@ -749,16 +807,20 @@ class Kson {
     private fun getParser(type: JType): TypeParser<*>? {
         val stored = this.stored.get()
         if (type is ParameterizedType) {
-            if (stored.containsKey(type))
-                return stored[type]!!.create(Type(type))
+            var key = Reflection.ParameterizedTypeImpl(type.ownerType, type.rawType, *OBJECT_TWO_PARAMETERS)
+            if (stored.containsKey(key))
+                return stored[key]!!.create(Type(type))
+            key = Reflection.ParameterizedTypeImpl(type.ownerType, type.rawType, *type.actualTypeArguments)
+            if (stored.containsKey(key))
+                return stored[key]!!.create(Type(type))
             val parameters = type.actualTypeArguments
             val raw = Reflection.getRawType(type.rawType)
             if (parameters.size == 2 && Reflection.isMap(raw))
-                return Factorys.getMapTypeFactory().create<Any, Any>(parameters[0], parameters[1])
+                return mapParserFactory.create<Any, Any>(parameters[0], parameters[1])
             if (parameters.size == 1 && Reflection.isCollection(raw))
-                return Factorys.getCollectionTypeFactory().create<Any>(parameters[0])
+                return collectionParserFactory.create<Any>(parameters[0])
 
-            if (type != Any::class.java)
+            if (raw != Any::class.java)
                 return getParser(raw)
         } else if (type is Class<*>) {
             if (Reflection.checkJsonPrimitive(type))
