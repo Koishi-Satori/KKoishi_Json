@@ -10,9 +10,11 @@ import top.kkoishi.json.internal.io.UtilParsers
 import top.kkoishi.json.internal.reflect.Reflection
 import top.kkoishi.json.io.TypeParser
 import top.kkoishi.json.io.TypeParserFactory
+import java.io.File
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Type
+import java.nio.file.Path
 import java.time.ZoneId
 import java.util.*
 import kotlin.jvm.Throws
@@ -50,6 +52,9 @@ internal object Utils {
             getFactory(BitSet::class.java, UtilParsers.BITSET),
             getFactory(TimeZone::class.java, UtilParsers.TIME_ZONE),
             getFactory(ZoneId::class.java, UtilParsers.ZONE_ID),
+            getFactory(Random::class.java, UtilParsers.RANDOM),
+            getFactory(File::class.java, UtilParsers.FILE),
+            getFactory(Path::class.java, UtilParsers.PATH)
         )
     }
 

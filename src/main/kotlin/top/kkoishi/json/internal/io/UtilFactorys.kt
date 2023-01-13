@@ -4,6 +4,8 @@ import top.kkoishi.json.internal.reflect.Reflection.isType
 import top.kkoishi.json.io.TypeParser
 import top.kkoishi.json.io.TypeParserFactory
 import top.kkoishi.json.reflect.Type
+import java.io.File
+import java.nio.file.Path
 import java.lang.reflect.Type as JType
 import java.util.*
 
@@ -12,6 +14,9 @@ internal object UtilFactorys {
         stored[Date::class.java] = getFactory(Date::class.java, UtilParsers.DATE)
         stored[UUID::class.java] = getFactory(UUID::class.java, UtilParsers.UUID)
         stored[Calendar::class.java] = getFactory(Calendar::class.java, UtilParsers.CALENDER)
+        stored[Random::class.java] = getFactory(Random::class.java, UtilParsers.RANDOM)
+        stored[File::class.java] = getFactory(File::class.java, UtilParsers.FILE)
+        stored[Path::class.java] = getFactory(Path::class.java, UtilParsers.PATH)
     }
 
     @JvmStatic
