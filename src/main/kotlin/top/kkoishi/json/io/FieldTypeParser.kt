@@ -23,6 +23,7 @@ import top.kkoishi.json.internal.reflect.Allocators
 import top.kkoishi.json.internal.reflect.Reflection
 import top.kkoishi.json.reflect.Type
 import java.lang.reflect.Field
+import java.lang.reflect.Method
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlin.jvm.Throws
@@ -253,13 +254,54 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
      * @param type The class to be converted.
      * @return unwrapped value.
      */
+    @Suppress("UNCHECKED_CAST")
     private fun unwrap(
         json: JsonElement,
         type: JType,
     ): Any? {
         if (json.isJsonNull())
             return null
-        return getParser(type).fromJson(json)
+        val parser = getParser(type)
+        val result = parser.fromJson(json)
+        if (parser is CollectionTypeParser<*>) {
+            val raw: Class<in Any> = Reflection.getRawType(type) as Class<in Any>
+            val collection: Any = try {
+                val constructor = raw.getDeclaredConstructor()
+                constructor.isAccessible = true
+                constructor.newInstance()
+            } catch (e: Exception) {
+                Allocators.unsafe<Any>(true).allocateInstance(raw)
+            } ?: throw IllegalStateException("Can not allocate instance of $type")
+            val add: Method = try {
+                Reflection.getMethod(collection.javaClass, "add", Any::class.java)
+            } catch (e: Exception) {
+                throw IllegalStateException(e)
+            }
+            val resource = result as Collection<*>
+            for (e in resource)
+                add(collection, e)
+            return collection
+        }
+        if (parser is MapTypeParser<*, *>) {
+            val raw: Class<in Any> = Reflection.getRawType(type) as Class<in Any>
+            val map = try {
+                val constructor = raw.getDeclaredConstructor()
+                constructor.isAccessible = true
+                constructor.newInstance()
+            } catch (e: Exception) {
+                Allocators.unsafe<Any>(true).allocateInstance(raw)
+            } ?: throw IllegalStateException("Can not allocate instance of $type")
+            val put: Method = try {
+                Reflection.getMethod(map.javaClass, "put", Any::class.java, Any::class.java)
+            } catch (e: Exception) {
+                throw IllegalStateException(e)
+            }
+            val resource = result as Map<*, *>
+            for ((k, v) in resource)
+                put(map, k, v)
+            return map
+        }
+        return result
     }
 
     @Suppress("UNCHECKED_CAST")

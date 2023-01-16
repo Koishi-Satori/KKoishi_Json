@@ -583,16 +583,15 @@ class Kson {
         val parser = getParser(type) ?: throw UnsupportedException("Can not get the parser of $type")
         val result = parser.fromJson(json)
         if (parser is CollectionTypeParser<*>) {
-            val collection: T = try {
-                val constructor = raw.getDeclaredConstructor()
+             val collection: T = try {
+               val constructor = raw.getDeclaredConstructor()
                 constructor.isAccessible = true
                 constructor.newInstance()
             } catch (e: Exception) {
                 Allocators.unsafe<T>(useUnsafe).allocateInstance(raw)
             }
-            val add: Method
-            try {
-                add = Reflection.getMethod(collection.javaClass, "add", Any::class.java)
+            val add: Method = try {
+                Reflection.getMethod(collection.javaClass, "add", Any::class.java)
             } catch (e: Exception) {
                 throw IllegalStateException(e)
             }
@@ -610,9 +609,8 @@ class Kson {
             } catch (e: Exception) {
                 Allocators.unsafe<T>(useUnsafe).allocateInstance(raw)
             }
-            val put: Method
-            try {
-                put = Reflection.getMethod(map.javaClass, "put", Any::class.java, Any::class.java)
+            val put: Method = try {
+                Reflection.getMethod(map.javaClass, "put", Any::class.java, Any::class.java)
             } catch (e: Exception) {
                 throw IllegalStateException(e)
             }
