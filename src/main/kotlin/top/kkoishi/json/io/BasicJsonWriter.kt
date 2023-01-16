@@ -9,7 +9,7 @@ import top.kkoishi.json.exceptions.UnsupportedException
 import java.io.Writer
 import kotlin.jvm.Throws
 
-class BasicJsonWriter @JvmOverloads constructor(
+open class BasicJsonWriter @JvmOverloads constructor(
     writer: Writer,
     private val lineSeparator: String = "\n",
 ) : JsonWriter(writer) {

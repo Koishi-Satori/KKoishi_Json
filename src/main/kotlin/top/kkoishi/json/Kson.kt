@@ -21,7 +21,7 @@ import java.lang.reflect.Field
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
-import java.sql.Ref
+import java.text.DateFormat
 import java.lang.reflect.Modifier as JModifier
 import java.util.*
 import kotlin.collections.ArrayDeque
@@ -37,7 +37,7 @@ import java.lang.reflect.Type as JType
  *
  * You can use constructors in Kson to create an instance, if the default/optional configuration provided
  * by constructors is all you need. Or you can also invoke methods in [KsonBuilder] to customize the pretty
- * output, the ignored modifiers and so on.
+ * output, the ignored modifiers, whether needed to translate html escape character, and so on.
  *
  * Here is an example of how to use this class on a simple class.
  *
@@ -99,17 +99,49 @@ import java.lang.reflect.Type as JType
  * And it provides another two constructors, which allows you to customize whether it use sun.misc.Unsafe for
  * serialization/deserialization and register some initial TypeParserFactories.
  *
+ * When serialize/deserialize some class need specify dateStyle/timeStyle/locale, Kson will use the field [dateStyle],
+ * [timeStyle] and [locale]. You can specify them when use the public constructors or use methods in KsonBuilder.
+ * The default value of dateStyle and timeStyle is [DateFormat.DEFAULT], and the locale is [Locale.getDefault].
+ *
+ * The field [useUnsafe] determines whether try to use sun.misc.Unsafe to allocate instance of a specified Type.
+ *
+ * This class defaultly serialize/serialize null value, if you want to make the result more loose, you can make field
+ * [ignoreNull] to true.
+ *
  * @author KKoishi_
  * @see TypeParser
  * @see TypeResolver
  * @see TypeParserFactory
  */
 class Kson {
+    /**
+     * The dateStyle used while serialize/deserialize the "time-related" classes.
+     */
     val dateStyle: Int
+
+    /**
+     * The timeStyle used while serialize/deserialize the "time-related" classes.
+     */
     val timeStyle: Int
+
+    /**
+     * The locale used when needed.
+     */
     val locale: Locale
+
+    /**
+     * Whether try to use sun.misc.Unsafe to allocate instance.
+     */
     val useUnsafe: Boolean
+
+    /**
+     * If ignore null value.
+     */
     val ignoreNull: Boolean
+
+    /**
+     * If translate html escape character.
+     */
     val htmlEscape: Boolean
 
     private val platform: Platform
@@ -209,6 +241,9 @@ class Kson {
         @JvmStatic
         private val OBJECT_TWO_PARAMETERS: Array<JType> = arrayOf(Any::class.java, Any::class.java)
 
+        /**
+         * Basic html escapes.
+         */
         @JvmStatic
         private val htmlEscapes =
             mapOf<Char, String>(' ' to "&emsp;",
@@ -635,16 +670,42 @@ class Kson {
         return parser.toJson(instance)
     }
 
+    /**
+     * This method can parse a JsonElement to a json string represent it.
+     *
+     * @param element the given JsonElement
+     * @return the json string
+     */
     fun toJsonString(element: JsonElement): String {
         if (htmlEscape)
             return htmlTranslate(toJsonStringImpl(element))
         return toJsonStringImpl(element)
     }
 
+    /**
+     * This method can parse a json string to its corresponding JsonElement.
+     *
+     * @param json the given json string
+     * @return the JsonElement
+     */
     fun fromJsonString(json: String): JsonElement = JsonParserFactory(platform, mode).create(json).parse()
 
+    /**
+     * This method can parse an instance of the specified type to the json string represent it.
+     *
+     * @param typeofT the type of T
+     * @param instance an instance
+     * @return a json string
+     */
     fun <T> toJsonString(typeofT: JType, instance: T?): String = toJsonString(toJson(typeofT, instance))
 
+    /**
+     * This method can parse a json string to the instance of the specified type.
+     *
+     * @param typeofT the type of T
+     * @param json the json string
+     * @return an instance
+     */
     fun <T> fromJsonString(typeofT: JType, json: String): T? = fromJson(typeofT, fromJsonString(json))
 
     /**
@@ -730,6 +791,14 @@ class Kson {
         return buffer.toString()
     }
 
+    /**
+     * Check if the field is ignored.
+     * All the transient and static fields will be default ignored, then this method will consider about
+     * [ignoredModifiers].
+     *
+     * @param field the field.
+     * @return if not ignored this.
+     */
     private fun checkField(field: Field): Boolean {
         val modifiers = field.modifiers
         if (JModifier.isStatic(modifiers) || JModifier.isTransient(modifiers))
@@ -885,25 +954,6 @@ class Kson {
         )
             return null
         return getIfNotContainsFromClass(rawType)
-    }
-
-    private fun <TYPE> getFactory(typeResolver: TypeResolver<TYPE>): TypeParserFactory? {
-        val parameterizedType = typeResolver.resolve() as ParameterizedType
-        return getFactory(parameterizedType)
-    }
-
-    private fun isMap(type: ParameterizedType): Boolean {
-        val raw = Reflection.getRawType(type.rawType)
-        if (Reflection.isMap(raw) && type.actualTypeArguments.size == 2)
-            return true
-        return false
-    }
-
-    private fun isCollection(type: ParameterizedType): Boolean {
-        val raw = Reflection.getRawType(type.rawType)
-        if (Reflection.isCollection(raw) && type.actualTypeArguments.size == 1)
-            return true
-        return false
     }
 
     /*-------------------------------- Override methods ------------------------------------*/

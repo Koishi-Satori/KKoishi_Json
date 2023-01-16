@@ -105,7 +105,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
                 unsafeSetValue(instance,
                     field,
                     initializedValue(field),
-                    unwrap(fieldValue, field.type))
+                    unwrap(fieldValue, field.genericType))
             }
         }
 
@@ -309,7 +309,7 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
                     else {
                         field.isAccessible = true
                         val fieldValue = if (obj.contains(name)) obj[name]!! else JsonNull.INSTANCE
-                        field[instance] = unwrap(fieldValue, field.type)
+                        field[instance] = unwrap(fieldValue, field.genericType)
                     }
                 }
                 while (later.isNotEmpty()) {

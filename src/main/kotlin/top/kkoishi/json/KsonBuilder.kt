@@ -11,6 +11,31 @@ import java.lang.reflect.Type
 import java.util.*
 import kotlin.collections.ArrayDeque as KArrayDeque
 
+/**
+ * This is the main class for using kkoishi.json ,and basically, it is used to customize and create
+ * [Kson] instance if the public constructors of Kson can not satisfy your demands.
+ *
+ * This class is thread-safe, you can use it at anyway.
+ *
+ * Through this class, you can register new TypeParser of the specified Type by invoking [register]
+ * method. Also, you can customize the dateStyle, timeStyle, locale, ignoredModifiers, and so on.
+ * You can make the Kson instance print pretty json string by invoke [prettyFormat] method, and use
+ * [unablePrettyFormat] to unable it.
+ *
+ * There are some examples:
+ *
+ * ```
+ * // Pretty output format, and ignore null values.
+ * // In Kotlin
+ * val builder = KsonBuilder()
+ * val kson = builder.prettyFormat().ingoreNull().create()
+ * ```
+ *
+ * You can use Kson instance to create a KsonBuilder, like ```val builder = KsonBuilder(kson)```.
+ *
+ * @author KKoishi
+ * @see Kson
+ */
 class KsonBuilder private constructor(
     private var dateStyle: Int,
     private var timeStyle: Int,
