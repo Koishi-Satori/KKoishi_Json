@@ -1,12 +1,15 @@
 package top.kkoishi.json.internal.io
 
 import top.kkoishi.json.*
+import top.kkoishi.json.exceptions.JsonInternalException
 import top.kkoishi.json.io.TypeParser
 import top.kkoishi.json.reflect.Type
 import top.kkoishi.json.reflect.TypeHelper.asType
 import java.io.File
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.net.URI
+import java.net.URL
 import java.nio.file.Path
 import java.text.DateFormat
 import java.time.ZoneId
@@ -29,7 +32,7 @@ internal object UtilParsers {
                 if (primitive.isJsonString())
                     return DateFormat.getDateTimeInstance(dateStyle, timeStyle, aLocale).parse(primitive.getAsString())
             }
-            return iae(json, "Date")
+            return iae(json, "Date", "Require JsonString")
         }
 
         override fun toJson(t: Date): JsonElement =
@@ -80,22 +83,26 @@ internal object UtilParsers {
                 }
                 return primitive.getAsAny()
             }
-            throw IllegalArgumentException("JsonElement $json is not JsonPrimitive instance")
+            return iae(json, type.rawType().typeName, "Type cast failed")
         }
 
         override fun toJson(t: Any): JsonElement = JsonPrimitive.createActual(t)
     }
 
     @JvmStatic
-    private fun <T> iae(json: JsonElement, target: String): T =
-        throw IllegalArgumentException("Can not serialize $json to $target")
+    private fun <T> iae(json: JsonElement, target: String, cause: String? = null): T =
+        throw JsonInternalException("Can not serialize $json to $target${if (cause == null) "" else ": $cause"}")
+
+    @JvmStatic
+    private fun <T> iae(json: JsonElement, target: String, cause: Throwable): T =
+        throw JsonInternalException("Can not serialize $json to $target$", cause)
 
     @JvmStatic
     @Suppress("NOTHING_TO_INLINE")
     private inline fun getArray(json: JsonElement, target: String): JsonArray {
         if (json.isJsonArray())
             return json.toJsonArray()
-        throw IllegalArgumentException("Can not serialize $json to $target")
+        return iae(json, target)
     }
 
     @JvmStatic
@@ -106,11 +113,14 @@ internal object UtilParsers {
         override fun fromJson(json: JsonElement): UUID {
             if (json.isJsonPrimitive()) {
                 val primitive = json.toJsonPrimitive()
-                if (primitive.isJsonString()) {
-                    return java.util.UUID.fromString(primitive.getAsString())
-                }
+                if (primitive.isJsonString())
+                    return try {
+                        java.util.UUID.fromString(primitive.getAsString())
+                    } catch (e: Exception) {
+                        iae(json, "UUID", e)
+                    }
             }
-            return iae(json, "UUID")
+            return iae(json, "UUID", "Require JsonString")
         }
 
         override fun toJson(t: UUID): JsonElement = JsonString(t.toString())
@@ -119,9 +129,13 @@ internal object UtilParsers {
     @JvmStatic
     internal val BITSET: TypeParser<BitSet> = object : TypeParser<BitSet>(Type(BitSet::class.java)) {
         override fun fromJson(json: JsonElement): BitSet = with(getArray(json, "BitSet")) {
-            return BitSet.valueOf(LongArray(this.size()) { index ->
-                this[index].toJsonPrimitive().getAsNumber().toLong()
-            })
+            return try {
+                BitSet.valueOf(LongArray(this.size()) { index ->
+                    this[index].toJsonPrimitive().getAsNumber().toLong()
+                })
+            } catch (e: Exception) {
+                iae(json, "BitSet", e)
+            }
         }
 
         override fun toJson(t: BitSet): JsonElement {
@@ -139,7 +153,7 @@ internal object UtilParsers {
                 if (primitive.isJsonString())
                     return Calendar.getInstance(TimeZone.getTimeZone(primitive.getAsString()))
             }
-            return iae(json, "Calender")
+            return iae(json, "Calender", "Require JsonString")
         }
 
         override fun toJson(t: Calendar): JsonElement = JsonString(t.timeZone.toZoneId().toString())
@@ -153,7 +167,7 @@ internal object UtilParsers {
                 if (primitive.isJsonString())
                     return TimeZone.getTimeZone(primitive.getAsString())
             }
-            return iae(json, "TimeZone")
+            return iae(json, "TimeZone", "Require JsonString")
         }
 
         override fun toJson(t: TimeZone): JsonElement = JsonString(t.toZoneId().toString())
@@ -167,7 +181,7 @@ internal object UtilParsers {
                 if (primitive.isJsonString())
                     return ZoneId.of(primitive.getAsString())
             }
-            return iae(json, "ZoneId")
+            return iae(json, "ZoneId", "Require JsonString")
         }
 
         override fun toJson(t: ZoneId): JsonElement = JsonString(t.toString())
@@ -187,7 +201,7 @@ internal object UtilParsers {
                 if (primitive.isJsonLong())
                     return Random(primitive.getAsNumber().toLong())
             }
-            return iae(json, "Random")
+            return iae(json, "Random", "Require JsonLong")
         }
 
         override fun toJson(t: Random): JsonElement = JsonLong((FIELD[t] as AtomicLong).get())
@@ -205,7 +219,7 @@ internal object UtilParsers {
                 if (filename != null)
                     return File(filename.toJsonPrimitive().getAsString())
             }
-            return iae(json, "File")
+            return iae(json, "File", "Illegal format")
         }
 
         override fun toJson(t: File): JsonElement {
@@ -218,21 +232,82 @@ internal object UtilParsers {
         override fun fromJson(json: JsonElement): Path {
             if (json.isJsonPrimitive()) {
                 val primitive = json.toJsonPrimitive()
-                return Path.of(primitive.getAsString())
+                return try {
+                    Path.of(primitive.getAsString())
+                } catch (e: Exception) {
+                    iae(json, "Path", e)
+                }
             }
             return with(getArray(json, "Path")) {
                 if (this.isEmpty())
-                    return iae(json, "Path")
-                if (this.size() == 1)
+                    return iae(json, "Path", "Path can not be empty")
+                if (this.size() == 1) try {
                     Path.of(this[0].toJsonPrimitive().getAsString())
-                else
+                } catch (e: Exception) {
+                    iae(json, "Path", e)
+                }
+                else try {
                     Path.of(this[0].toJsonPrimitive().getAsString(),
                         *Array(this.size() - 1) { index -> this[index + 1].toJsonPrimitive().getAsString() })
+                } catch (e: Exception) {
+                    iae(json, "Path", e)
+                }
             }
         }
 
         override fun toJson(t: Path): JsonElement {
             return JsonString(t.pathString)
+        }
+    }
+
+    @JvmStatic
+    internal val URL: TypeParser<URL> = object : TypeParser<URL>(Type(java.net.URL::class.java)) {
+        @Suppress("NOTHING_TO_INLINE")
+        private inline fun fromJsonObject(obj: JsonObject): URL {
+            val protocol = obj["protocol"] ?: return iae(obj, "URL")
+            val host = obj["host"] ?: return iae(obj, "URL")
+            val file = obj["file"] ?: return iae(obj, "URL")
+            if (protocol.isJsonPrimitive() && host.isJsonPrimitive() && file.isJsonPrimitive()) {
+                val protocolStr = protocol.toJsonPrimitive().getAsString()
+                val hostStr = host.toJsonPrimitive().getAsString()
+                val fileStr = file.toJsonPrimitive().getAsString()
+                val port = obj["port"] ?: return URL(protocolStr, hostStr, fileStr)
+                if (port.isJsonPrimitive()) {
+                    val portInt = port.toJsonPrimitive()
+                    if (portInt.isIntegral())
+                        return URL(protocolStr, hostStr, portInt.getAsNumber().toInt(), fileStr)
+                }
+            }
+            return iae(obj, "URL", "Illegal format")
+        }
+
+        override fun fromJson(json: JsonElement): URL {
+            try {
+                if (json.isJsonObject())
+                    return fromJsonObject(json.toJsonObject())
+                else if (json.isJsonPrimitive()) {
+                    val primitive = json.toJsonPrimitive()
+                    if (primitive.isJsonString())
+                        return URL(primitive.getAsString())
+                }
+            } catch (e: Exception) {
+                throw JsonInternalException(e)
+            }
+            return iae(json, "URL")
+        }
+
+        override fun toJson(t: URL): JsonElement {
+            return JsonString(t.toExternalForm())
+        }
+    }
+
+    internal val URI: TypeParser<URI> = object : TypeParser<URI>(Type(java.net.URI::class.java)) {
+        override fun fromJson(json: JsonElement): URI {
+            TODO("Not yet implemented")
+        }
+
+        override fun toJson(t: URI): JsonElement {
+            TODO("Not yet implemented")
         }
     }
 
