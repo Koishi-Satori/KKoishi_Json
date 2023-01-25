@@ -6,11 +6,17 @@ import top.kkoishi.json.internal.reflect.Reflection
 import top.kkoishi.json.io.*
 import top.kkoishi.json.reflect.Type
 import top.kkoishi.json.reflect.TypeResolver
+import top.kkoishi.json.Kson
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.ParameterizedType
 
 import java.lang.reflect.Type as JType
 
+/**
+ * A class used to get TypeParsers without using [Kson].
+ *
+ * @author KKoishi_
+ */
 object Factorys {
     @JvmStatic
     private val stored: MutableMap<JType, TypeParserFactory> = mutableMapOf()

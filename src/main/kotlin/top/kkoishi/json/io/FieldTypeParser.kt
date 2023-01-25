@@ -158,6 +158,12 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
         }
     }
 
+    /**
+     * Get the parse of the specified type.
+     *
+     * @param type the specified type.
+     * @return parser.
+     */
     protected open fun getParser(type: JType): TypeParser<*> = ParserManager.getParser(type)
 
     /**

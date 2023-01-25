@@ -28,7 +28,7 @@ import kotlin.collections.ArrayDeque as KArrayDeque
  * // Pretty output format, and ignore null values.
  * // In Kotlin
  * val builder = KsonBuilder()
- * val kson = builder.prettyFormat().ingoreNull().create()
+ * val kson = builder.prettyFormat().ignoreNull().create()
  * ```
  *
  * You can use Kson instance to create a KsonBuilder, like ```val builder = KsonBuilder(kson)```.

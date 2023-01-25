@@ -20,13 +20,21 @@ import java.util.*
 import kotlin.jvm.Throws
 
 /**
- * An util class used to access some methods in sun.misc.Unsafe and get the [TypeParserFactory]
+ * This is an util class used to access some methods in sun.misc.Unsafe and get the [TypeParserFactory]
  * of some basic classes.
  *
  * Some JVM environment might lack of [jdk.unsupported] module, so the methods are acquired by
  * reflection.
+ *
+ * @author KKoishi_
  */
 internal object Utils {
+    /**
+     * This method is used while initialize Kson instance.
+     *
+     * @param inst Kson instance.
+     * @return a list contains pairs of java Types and their TypeParserFactory.
+     */
     @JvmStatic
     internal fun KKoishiJsonInit(inst: Kson): List<Pair<Type, TypeParserFactory>> {
         // TODO: init some basic classes.
@@ -58,6 +66,11 @@ internal object Utils {
         )
     }
 
+    /**
+     * This method is used to get the Unsafe instance.
+     *
+     * @return Unsafe instance.
+     */
     @JvmStatic
     private fun accessUnsafe(): Any? {
         try {
@@ -71,6 +84,12 @@ internal object Utils {
         return null
     }
 
+    /**
+     * This method is used to get Unsafe class.
+     * Some jvm environment might in lack of sun.misc package, so use reflection is needed.
+     *
+     * @return sun.misc.Unsafe.class
+     */
     @JvmStatic
     private fun accessUnsafeClass(): Class<*>? {
         try {

@@ -2,6 +2,11 @@ package top.kkoishi.json.parse
 
 import top.kkoishi.json.exceptions.JsonInvalidFormatException
 
+/**
+ * The JsonLexer used to tokenize json string.
+ *
+ * @author KKoishi_
+ */
 internal abstract class JsonLexer(protected var iterator: Iterator<Char>) {
     protected var lookup = reset0()
     protected var quoteFlag = false

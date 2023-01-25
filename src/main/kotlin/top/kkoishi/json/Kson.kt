@@ -144,13 +144,33 @@ class Kson {
      */
     val htmlEscape: Boolean
 
+    /**
+     * These two fields is used to determine the method to parsing numbers and some OS-related details (e.g. the line
+     * separator).
+     */
     private val platform: Platform
     private val mode: NumberMode
+
+    /**
+     * This field is used to store some cached TypeParserFactory and those are registered while creating instance.
+     */
     private val stored: ThreadLocal<MutableMap<JType, TypeParserFactory>> = ThreadLocal()
+
+    /**
+     * The next three factory is internal factory used while parsing.
+     */
     private var fieldParserFactory: InternalFieldParserFactory
     private var mapParserFactory: MapTypeParserFactory
     private var collectionParserFactory: CollectionTypeParserFactory
+
+    /**
+     * The ignored modifiers, stored as the JVM modifier magic numbers.
+     */
     private var ignoredModifiers: Int = 0x0000
+
+    /**
+     * Currently used Writer, mainly used for pretty printing.
+     */
     private val jsonWriter: ThreadLocal<Writer?> = ThreadLocal()
 
     /*-------------------------------- Constructors ------------------------------------*/
@@ -224,7 +244,13 @@ class Kson {
 
     /*-------------------------------- Static Part ------------------------------------*/
 
+    /**
+     * This companion object is used to store some internal classes, constants and methods.
+     *
+     * @author KKoishi_
+     */
     internal companion object {
+        /*----------------------- Constants Start --------------------*/
         private const val DEFAULT_DATE_STYLE = 2
         private const val DEFAULT_TIME_STYLE = 2
 
@@ -240,6 +266,8 @@ class Kson {
 
         @JvmStatic
         private val OBJECT_TWO_PARAMETERS: Array<JType> = arrayOf(Any::class.java, Any::class.java)
+
+        /*------------------------ Constants End ---------------------*/
 
         /**
          * Basic html escapes.
@@ -415,8 +443,19 @@ class Kson {
             override fun <T : Any> create(type: Type<T>): TypeParser<T> = InternalFieldTypeParser<T>(type, instance)
         }
 
+        /**
+         * The internal field parser.
+         *
+         * @author KKoishi_
+         */
         private open class InternalFieldTypeParser<T : Any>(type: Type<T>, override val instance: Kson) :
             FieldTypeParser<T>(type), InternalParserFactory.Conditional {
+            /**
+             * This method use [Kson.getParser] to get the parser of the specified type.
+             *
+             * @param type the specified type.
+             * @return TypeParser.
+             */
             override fun getParser(type: java.lang.reflect.Type): TypeParser<*> =
                 instance.getParser(type) ?: throw IllegalStateException("Can not get the parser of $type")
 
@@ -460,6 +499,9 @@ class Kson {
                 return FieldData(field)
             }
 
+            /**
+             * Check is the getter method exists.
+             */
             private fun checkGetter(getterName: String): Method? {
                 return try {
                     type.rawType().getDeclaredMethod(getterName)
@@ -492,7 +534,7 @@ class Kson {
         }
 
         private class MapTypeParserFactory {
-            private val instances = HashMap<ParameterizedType, MapTypeParser<*, *>>()
+            private val cached = HashMap<ParameterizedType, MapTypeParser<*, *>>()
 
             @Suppress("UNCHECKED_CAST")
             fun <K, V> create(
@@ -502,17 +544,17 @@ class Kson {
                 ownerType: JType? = null,
             ): MapTypeParser<K, V> where K : Any, V : Any {
                 val key = Reflection.ParameterizedTypeImpl(null, rawType, kType, vType)
-                var inst: MapTypeParser<K, V>? = instances[key] as MapTypeParser<K, V>?
+                var inst: MapTypeParser<K, V>? = cached[key] as MapTypeParser<K, V>?
                 if (inst == null) {
                     inst = MapTypeParser.` getInstance`(Type(MutableMap::class.java), kType, vType)
-                    instances[key] = inst
+                    cached[key] = inst
                 }
                 return inst
             }
         }
 
         private class CollectionTypeParserFactory {
-            private val instances = HashMap<ParameterizedType, CollectionTypeParser<*>>()
+            private val cached = HashMap<ParameterizedType, CollectionTypeParser<*>>()
 
             @Suppress("UNCHECKED_CAST")
             fun <T> create(
@@ -521,10 +563,10 @@ class Kson {
                 ownerType: JType? = null,
             ): CollectionTypeParser<T> where T : Any {
                 val key = Reflection.ParameterizedTypeImpl(ownerType, rawType, tType)
-                var inst: CollectionTypeParser<T>? = instances[key] as CollectionTypeParser<T>?
+                var inst: CollectionTypeParser<T>? = cached[key] as CollectionTypeParser<T>?
                 if (inst == null) {
                     inst = CollectionTypeParser.` getInstance`(Type(Collection::class.java), tType)
-                    instances[key] = inst
+                    cached[key] = inst
                 }
                 return inst
             }
@@ -583,8 +625,8 @@ class Kson {
         val parser = getParser(type) ?: throw UnsupportedException("Can not get the parser of $type")
         val result = parser.fromJson(json)
         if (parser is CollectionTypeParser<*>) {
-             val collection: T = try {
-               val constructor = raw.getDeclaredConstructor()
+            val collection: T = try {
+                val constructor = raw.getDeclaredConstructor()
                 constructor.isAccessible = true
                 constructor.newInstance()
             } catch (e: Exception) {
@@ -806,6 +848,12 @@ class Kson {
         return true
     }
 
+    /**
+     * This method can write JsonElement to the equivalent json string.
+     *
+     * @param element the specified JsonElement.
+     * @param buffer the buffer.
+     */
     private fun writeJson(element: JsonElement, buffer: StringBuilder) {
         if (element.isJsonPrimitive())
             buffer.append(element.toString())
@@ -873,6 +921,9 @@ class Kson {
     @Suppress("UNCHECKED_CAST")
     private fun getParser(type: JType): TypeParser<*>? {
         val stored = this.stored.get()
+        // If the type is ParameterizedType, the try to judge if it is Collection or Map.
+        // If not, get parse from collectionParserFactory or mapParserFactory,
+        // or get from cached parsers.
         if (type is ParameterizedType) {
             var key = Reflection.ParameterizedTypeImpl(type.ownerType, type.rawType, *OBJECT_TWO_PARAMETERS)
             if (stored.containsKey(key))
