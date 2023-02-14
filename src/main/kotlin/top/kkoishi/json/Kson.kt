@@ -1010,4 +1010,44 @@ class Kson {
     override fun toString(): String {
         return "KKoishiJson"
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Kson) return false
+
+        if (dateStyle != other.dateStyle) return false
+        if (timeStyle != other.timeStyle) return false
+        if (locale != other.locale) return false
+        if (useUnsafe != other.useUnsafe) return false
+        if (ignoreNull != other.ignoreNull) return false
+        if (htmlEscape != other.htmlEscape) return false
+        if (platform != other.platform) return false
+        if (mode != other.mode) return false
+        if (stored != other.stored) return false
+        if (fieldParserFactory != other.fieldParserFactory) return false
+        if (mapParserFactory != other.mapParserFactory) return false
+        if (collectionParserFactory != other.collectionParserFactory) return false
+        if (ignoredModifiers != other.ignoredModifiers) return false
+        if (jsonWriter != other.jsonWriter) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = dateStyle
+        result = 31 * result + timeStyle
+        result = 31 * result + locale.hashCode()
+        result = 31 * result + useUnsafe.hashCode()
+        result = 31 * result + ignoreNull.hashCode()
+        result = 31 * result + htmlEscape.hashCode()
+        result = 31 * result + platform.hashCode()
+        result = 31 * result + mode.hashCode()
+        result = 31 * result + stored.hashCode()
+        result = 31 * result + fieldParserFactory.hashCode()
+        result = 31 * result + mapParserFactory.hashCode()
+        result = 31 * result + collectionParserFactory.hashCode()
+        result = 31 * result + ignoredModifiers
+        result = 31 * result + jsonWriter.hashCode()
+        return result
+    }
 }

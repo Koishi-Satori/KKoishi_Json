@@ -189,11 +189,7 @@ internal object UtilParsers {
 
     @JvmStatic
     internal val RANDOM: TypeParser<Random> = object : TypeParser<Random>(Type(Random::class.java)) {
-        private val FIELD = Random::class.java.getDeclaredField("seed")
-
-        init {
-            FIELD.isAccessible = true
-        }
+        private val OFFSET: Long = top.kkoishi.json.internal.Utils.objectFieldOffset(Random::class.java.getDeclaredField("seed"))
 
         override fun fromJson(json: JsonElement): Random {
             if (json.isJsonPrimitive()) {
@@ -204,7 +200,9 @@ internal object UtilParsers {
             return iae(json, "Random", "Require JsonLong")
         }
 
-        override fun toJson(t: Random): JsonElement = JsonLong((FIELD[t] as AtomicLong).get())
+        override fun toJson(t: Random): JsonElement {
+            return JsonLong((top.kkoishi.json.internal.Utils.getObject(t, OFFSET) as AtomicLong).get())
+        }
     }
 
     @JvmStatic
@@ -301,6 +299,7 @@ internal object UtilParsers {
         }
     }
 
+    @JvmStatic
     internal val URI: TypeParser<URI> = object : TypeParser<URI>(Type(java.net.URI::class.java)) {
         override fun fromJson(json: JsonElement): URI {
             TODO("Not yet implemented")

@@ -28,14 +28,17 @@ abstract class JsonParser internal constructor(iterator: Iterator<Char>, platfor
             return when (token.type) {
                 Type.ARRAY_BLANKET_BEGIN -> jsonArray()
                 Type.BLANKET_BEGIN -> jsonObject()
-                else -> throw JsonSyntaxException("The json string must begin with '[' or '{'")
+                else -> throw JsonSyntaxException("The json string must begin with '[' or '{'.\n" +
+                        "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
             }
         }
-        throw JsonSyntaxException("The json string is empty.")
+        throw JsonSyntaxException("The json string is empty.\n" +
+                "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
     }
 
     private fun element(): JsonElement {
-        assert(lexer.hasNextToken()) { throw JsonSyntaxException("Unfinished json element") }
+        assert(lexer.hasNextToken()) { throw JsonSyntaxException("Unfinished json element.\n" +
+                "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}") }
         val token = lexer.nextToken()
         return when (token.type) {
             Type.QUOTE -> JsonString(parseString())
@@ -44,7 +47,8 @@ abstract class JsonParser internal constructor(iterator: Iterator<Char>, platfor
             Type.NUMBER -> judgeNumber(token.content)
             Type.NULL -> JsonNull.INSTANCE
             Type.BOOL -> JsonBool(token.content.isEmpty())
-            else -> throw JsonSyntaxException("The json element start token $token is invalid")
+            else -> throw JsonSyntaxException("The json element start token $token is invalid.\n" +
+                    "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
         }
     }
 
@@ -62,12 +66,15 @@ abstract class JsonParser internal constructor(iterator: Iterator<Char>, platfor
                 token = lexer.nextToken()
                 when (token.type) {
                     Type.SEPARATOR -> if (!lexer.hasNextToken())
-                        throw JsonSyntaxException("The json array is not completed")
+                        throw JsonSyntaxException("The json array is not completed.\n" +
+                                "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
                     Type.ARRAY_BLANKET_END -> break
-                    else -> throw JsonSyntaxException("Syntax Error: There should be a ',' or '}' after the array element is ended")
+                    else -> throw JsonSyntaxException("There should be a ',' or ']' after the array element is ended." +
+                            "\n\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
                 }
             } else
-                throw JsonSyntaxException("The json array is not completed")
+                throw JsonSyntaxException("The json array is not completed.\n" +
+                        "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
         }
         return JsonArray(arr)
     }
@@ -80,16 +87,19 @@ abstract class JsonParser internal constructor(iterator: Iterator<Char>, platfor
             Type.NUMBER -> judgeNumber(last.content)
             Type.NULL -> JsonNull.INSTANCE
             Type.BOOL -> JsonBool(last.content.isEmpty())
-            else -> throw JsonSyntaxException("The json element start token $last is invalid")
+            else -> throw JsonSyntaxException("The json element start token $last is invalid.\n" +
+                    "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
         }
     }
 
     internal open fun parseString(): String {
         if (!lexer.hasNextToken())
-            throw JsonSyntaxException("Unfinished json string")
+            throw JsonSyntaxException("Unfinished json string.\n" +
+                    "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
         val token = lexer.nextToken()
         assert(lexer.hasNextToken() && lexer.nextToken().type == Type.QUOTE) {
-            throw JsonSyntaxException("The json string must end with '\"'")
+            throw JsonSyntaxException("The json string must end with '\"'.\n" +
+                    "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
         }
         return token.content
     }
@@ -103,17 +113,21 @@ abstract class JsonParser internal constructor(iterator: Iterator<Char>, platfor
             else if (token.type == Type.BLANKET_END)
                 return obj
             else
-                throw JsonSyntaxException("The json object entry has invalid format")
+                throw JsonSyntaxException("The json object entry has invalid format.\n" +
+                        "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
             if (lexer.hasNextToken()) {
                 token = lexer.nextToken()
                 when (token.type) {
                     Type.SEPARATOR -> if (!lexer.hasNextToken())
-                        throw JsonSyntaxException("The json object is not completed")
+                        throw JsonSyntaxException("The json object is not completed.\n" +
+                                "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
                     Type.BLANKET_END -> break
-                    else -> throw JsonSyntaxException("Syntax Error: There should be a ',' or '}' after the entry is ended")
+                    else -> throw JsonSyntaxException("Syntax Error: There should be a ',' or '}' after the entry is ended.\n" +
+                            "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
                 }
             } else
-                throw JsonSyntaxException("The json object is not completed")
+                throw JsonSyntaxException("The json object is not completed.\n" +
+                        "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
         }
         return obj
     }
@@ -126,7 +140,8 @@ abstract class JsonParser internal constructor(iterator: Iterator<Char>, platfor
 
     private fun entryValue(): JsonElement {
         assert(lexer.hasNextToken() && lexer.nextToken().type == Type.COLON) {
-            throw JsonSyntaxException("There must exist one colon between key and value of entry in json object")
+            throw JsonSyntaxException("There must exist one colon between key and value of entry in json object.\n" +
+                    "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
         }
         return element()
     }

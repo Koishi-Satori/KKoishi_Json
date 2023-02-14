@@ -162,4 +162,8 @@ internal abstract class JsonLexer(protected var iterator: Iterator<Char>) {
         end = false
         lookup = reset0()
     }
+
+    fun line() = lineNumber
+
+    fun col() = colCount
 }
