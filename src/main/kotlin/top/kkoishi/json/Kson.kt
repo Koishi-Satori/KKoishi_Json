@@ -855,9 +855,12 @@ class Kson {
      * @param buffer the buffer.
      */
     private fun writeJson(element: JsonElement, buffer: StringBuilder) {
-        if (element.isJsonPrimitive())
-            buffer.append(element.toString())
-        else if (element.isJsonArray())
+        if (element.isJsonPrimitive()) {
+            if (element.toJsonPrimitive().isJsonString())
+                buffer.append('"').append(element.toString()).append('"')
+            else
+                buffer.append(element.toString())
+        } else if (element.isJsonArray())
             writeJsonArray(element.toJsonArray(), buffer)
         else
             writeJsonObject(element.toJsonObject(), buffer)

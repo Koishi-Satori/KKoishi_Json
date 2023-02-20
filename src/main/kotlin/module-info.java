@@ -11,4 +11,11 @@ module kkoishi.json {
     requires kotlin.stdlib;
     requires kotlin.stdlib.jdk7;
     requires kotlin.stdlib.jdk8;
+
+    opens top.kkoishi.json;
+    opens top.kkoishi.json.io;
+    opens top.kkoishi.json.parse;
+    opens top.kkoishi.json.reflect;
+    opens top.kkoishi.json.annotation;
+    opens top.kkoishi.json.exceptions;
 }
