@@ -983,14 +983,13 @@ class Kson {
     }
 
     private fun getIfNotContainsFromClass(type: Class<*>): TypeParserFactory {
-        if (type.isArray)
-            return Factorys.getArrayTypeFactory()
-        else if (Reflection.isMap(type) || Reflection.isCollection(type))
-            throw IllegalArgumentException("Can not get the parser of $type")
-        else if (Reflection.checkJsonPrimitive(type))
-            return UtilFactorys.PRIMITIVE
-        else
-            return getFieldTypeFactory()
+        return when {
+            type.isArray -> Factorys.getArrayTypeFactory()
+            Reflection.isMap(type) || Reflection.isCollection(type) ->
+                throw IllegalArgumentException("Can not get the parser of $type")
+            Reflection.checkJsonPrimitive(type) -> UtilFactorys.PRIMITIVE
+            else -> getFieldTypeFactory()
+        }
     }
 
     private fun getFactory(parameterizedType: ParameterizedType): TypeParserFactory? {

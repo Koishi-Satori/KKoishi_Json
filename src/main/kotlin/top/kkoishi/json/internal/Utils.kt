@@ -14,6 +14,9 @@ import java.io.File
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Type
+import java.net.InetAddress
+import java.net.URI
+import java.net.URL
 import java.nio.file.Path
 import java.time.ZoneId
 import java.util.*
@@ -62,7 +65,10 @@ internal object Utils {
             getFactory(ZoneId::class.java, UtilParsers.ZONE_ID),
             getFactory(Random::class.java, UtilParsers.RANDOM),
             getFactory(File::class.java, UtilParsers.FILE),
-            getFactory(Path::class.java, UtilParsers.PATH)
+            getFactory(Path::class.java, UtilParsers.PATH),
+            getFactory(URI::class.java, UtilParsers.URI),
+            getFactory(URL::class.java, UtilParsers.URL),
+            getFactory(InetAddress::class.java, UtilParsers.INET_ADDRESS)
         )
     }
 

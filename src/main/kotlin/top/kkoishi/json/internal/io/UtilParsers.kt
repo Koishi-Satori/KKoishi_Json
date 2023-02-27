@@ -8,13 +8,13 @@ import top.kkoishi.json.reflect.TypeHelper.asType
 import java.io.File
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.net.URI
-import java.net.URL
+import java.net.*
 import java.nio.file.Path
 import java.text.DateFormat
 import java.time.ZoneId
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
+import java.util.regex.Pattern
 import kotlin.io.path.pathString
 import java.lang.reflect.Type as JType
 import kotlin.reflect.KClass
@@ -189,7 +189,8 @@ internal object UtilParsers {
 
     @JvmStatic
     internal val RANDOM: TypeParser<Random> = object : TypeParser<Random>(Type(Random::class.java)) {
-        private val OFFSET: Long = top.kkoishi.json.internal.Utils.objectFieldOffset(Random::class.java.getDeclaredField("seed"))
+        private val OFFSET: Long =
+            top.kkoishi.json.internal.Utils.objectFieldOffset(Random::class.java.getDeclaredField("seed"))
 
         override fun fromJson(json: JsonElement): Random {
             if (json.isJsonPrimitive()) {
@@ -289,7 +290,7 @@ internal object UtilParsers {
                         return URL(primitive.getAsString())
                 }
             } catch (e: Exception) {
-                throw JsonInternalException(e)
+                return iae(json, "URL", e)
             }
             return iae(json, "URL")
         }
@@ -302,13 +303,42 @@ internal object UtilParsers {
     @JvmStatic
     internal val URI: TypeParser<URI> = object : TypeParser<URI>(Type(java.net.URI::class.java)) {
         override fun fromJson(json: JsonElement): URI {
-            TODO("Not yet implemented")
+            try {
+                if (json.isJsonPrimitive()) {
+                    val primitive = json.toJsonPrimitive()
+                    if (primitive.isJsonString())
+                        return java.net.URI.create(primitive.getAsString())
+                }
+            } catch (e: Exception) {
+                return iae(json, "URI", e)
+            }
+            return iae(json, "URI")
         }
 
-        override fun toJson(t: URI): JsonElement {
-            TODO("Not yet implemented")
-        }
+        override fun toJson(t: URI): JsonElement = JsonString(t.toASCIIString())
     }
+
+    @JvmStatic
+    internal val INET_ADDRESS: TypeParser<InetAddress> =
+        object : TypeParser<InetAddress>(Type(InetAddress::class.java)) {
+            override fun fromJson(json: JsonElement): InetAddress {
+                InetAddress.getByName("")
+                if (json.isJsonPrimitive()) {
+                    val primitive = json.toJsonPrimitive()
+                    if (primitive.isJsonString())
+                        return try {
+                            InetAddress.getByName(primitive.getAsString())
+                        } catch (e: UnknownHostException) {
+                            iae(json, "InetAddress", e)
+                        }
+                }
+                return iae(json, "InetAddress")
+            }
+
+            override fun toJson(t: InetAddress): JsonElement {
+                return JsonString(t.canonicalHostName)
+            }
+        }
 
     /*----------------------------- Primitive Parsers -----------------------------*/
 
