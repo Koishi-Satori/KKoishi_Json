@@ -15,26 +15,30 @@ import java.lang.reflect.Type as JType
 /**
  * A class used to get TypeParsers without using [Kson].
  *
+ * Now this class is thread-safety.
+ *
  * @author KKoishi_
  */
 object Factorys {
     @JvmStatic
-    private val stored: MutableMap<JType, TypeParserFactory> = mutableMapOf()
+    private val cached: ThreadLocal<MutableMap<JType, TypeParserFactory>> = ThreadLocal()
 
     init {
+        val stored = HashMap<JType, TypeParserFactory>()
         UtilFactorys.init(stored)
+        cached.set(stored)
     }
 
     @JvmStatic
     @JvmName(" addType")
-    internal fun addType(type: JType, factory: TypeParserFactory) {
-        stored[type] = factory
+    fun register(type: JType, factory: TypeParserFactory) {
+        cached.get()[type] = factory
     }
 
     @JvmStatic
     @JvmName(" get")
     internal fun get(type: JType): TypeParserFactory? {
-        return stored.getOrDefault(type, null)
+        return cached.get().getOrDefault(type, null)
     }
 
     @JvmStatic
@@ -51,8 +55,10 @@ object Factorys {
 
     @JvmStatic
     fun getFactoryFromClass(type: Class<*>): TypeParserFactory {
-        if (stored.containsKey(type))
-            return stored[type]!!
+        with(cached.get()){
+            if (containsKey(type))
+                return this[type]!!
+        }
         return getIfNotContainsFromClass(type)
     }
 
@@ -74,6 +80,7 @@ object Factorys {
         if (type is ParameterizedType) {
             val parameters = type.actualTypeArguments
             val key = Reflection.ParameterizedTypeImpl(type.ownerType, type.rawType, *parameters)
+            val stored = cached.get()
             if (stored.containsKey(key))
                 return stored[key]!!
             val raw = Reflection.getRawType(type.rawType)
@@ -96,7 +103,7 @@ object Factorys {
                     getter(if (Reflection.isStatic(getter)) null else Allocators.unsafeAny(true)
                         .allocateInstance(type as Class<Any>)) as TypeParserFactory?
                         ?: return getFactoryFromClass(type)
-                addType(type, factory)
+                register(type, factory)
                 return factory
             }
             return getFactoryFromClass(type)
@@ -117,6 +124,7 @@ object Factorys {
             throw IllegalStateException("Can not get Parameters, please make sure that you fill in the complete generic parameters")
         val arguments = type.actualTypeArguments
         val key = Reflection.ParameterizedTypeImpl(type.ownerType, type.rawType, *arguments)
+        val stored = cached.get()
         if (stored.containsKey(key)) {
             return stored[key]!!
         }

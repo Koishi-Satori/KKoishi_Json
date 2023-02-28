@@ -39,7 +39,7 @@ internal object ParserManager {
                     getter(if (Reflection.isStatic(getter)) null else Allocators.unsafeAny(true)
                         .allocateInstance(type as Class<Any>)) as TypeParserFactory?
                         ?: return getFromType()
-                Factorys.addType(type, factory)
+                Factorys.register(type, factory)
                 return factory.create(KType(type))
             }
             return Factorys.getFactoryFromClass(type).create(KType(type))
