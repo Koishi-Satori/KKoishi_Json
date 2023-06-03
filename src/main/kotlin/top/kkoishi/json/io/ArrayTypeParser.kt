@@ -36,11 +36,11 @@ class ArrayTypeParser<T> private constructor(type: Type<T>) : TypeParser<T>(type
         return arr
     }
 
-    private fun parseImpl(json: JsonElement): Array<Any?> {
+    private fun parseImpl(json: JsonElement, componentType: Class<*> = type.rawType().componentType): Array<Any?> {
         if (!json.isJsonArray())
             throw JsonCastException()
         val arr: JsonArray = json.toJsonArray()
-        return Array(arr.size()) { unwrap(arr[it], arr[it].javaClass) }
+        return Array(arr.size()) { unwrap(arr[it], componentType) }
     }
 
     private fun <E> unwrap(json: JsonElement, clz: Class<E>): Any? where E : Any{

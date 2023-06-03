@@ -148,14 +148,30 @@ abstract class FieldTypeParser<T : Any> protected constructor(type: Type<T>) : T
         return when (f.type) {
             Integer.TYPE, Integer::class.java -> compareAndSwapInt(inst,
                 objectFieldOffset(f),
-                expect as Int,
-                value as Int)
+                expect.toInt(),
+                value.toInt())
             java.lang.Long.TYPE, java.lang.Long::class.java -> compareAndSwapLong(inst,
                 objectFieldOffset(f),
-                expect as Long,
-                value as Long)
+                expect.toLong(),
+                value.toLong())
             else -> compareAndSwapObject(inst, objectFieldOffset(f), expect, value)
         }
+    }
+
+    private fun Any?.toInt(): Int {
+        if (this == null)
+            return 0
+        if (this is Number)
+            return toInt()
+        return hashCode()
+    }
+
+    private fun Any?.toLong(): Long {
+        if (this == null)
+            return 0
+        if (this is Number)
+            return toLong()
+        return hashCode().toLong()
     }
 
     /**

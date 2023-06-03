@@ -1,0 +1,1740 @@
+[
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "69H80Qpn5cgRqoHBXrWHNgurceaXNiK",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方边境防御[简单]#2",
+    "playerCount": 0,
+    "playlist": "fd_easy"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "ONmh6dmxlqXYRGODIBIsbSvGN2yG37z",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方边境防御[普通]#2",
+    "playerCount": 0,
+    "playlist": "fd_normal"
+  },
+  {
+    "description": "QQ群456665285,感谢cmggy",
+    "gameState": 4,
+    "hasPassword": false,
+    "id": "A5QFFCLwoA7kYqU7TKcOY0wiVWEOqKV",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_eden",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【超好玩】透视自瞄",
+    "playerCount": 15,
+    "playlist": "ps"
+  },
+  {
+    "description": "超級速度，超級驱动，杀就完事了",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "zXysLnd9v4fuqBbn6yiLB7aEJgLiLhC",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_thaw",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "[CN]坏逼们的服务器#超机动铁对铁",
+    "playerCount": 0,
+    "playlist": "ps"
+  },
+  {
+    "description": "浪人20发子弹,铁驭2倍强化,北极星装备野兽技能组，军团双倍弹匣。感谢Cube提供的titanchange模组作为基版,感谢VoyageDB提供的全能快速武装。铁驭寿司店Q群297-319-959",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "y5IiiPODgrSdNjX4TCg1M4NBhFZcrXF",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_glitch",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【SSD5边境战争】四次元弹匣",
+    "playerCount": 0,
+    "playlist": "fw"
+  },
+  {
+    "description": "从huians这边接手，服务器设有重生保护，对重生位置不满意的可以按E自爆重新复活，不计入死亡次数。有问题来群里找MyaccountCp。***非常感谢DB提供的技术支持***",
+    "gameState": 4,
+    "hasPassword": false,
+    "id": "6FtINy302wNfqeUswmvZV9c4XY6AoKQ",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_lf_meadow",
+    "maxPlayers": 20,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【抗压服】明日香会寻到仿生量产机吗？20TT",
+    "playerCount": 3,
+    "playlist": "ttdm"
+  },
+  {
+    "description": "武器可使用克莱博、电能步枪。技能可使用钩爪(不可勾中玩家)、激素、脉冲刀、幻影铁驭。重火力可用一次，仅对自身造成伤害，可使用重力星(无吸附)、炸药包、破片手雷。",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "MhY3FTIwMdJA1eitRuOwF2SmVVQ8YCw",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 20,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.0"
+        }
+      ]
+    },
+    "name": "克莱博服 Kraber Only",
+    "playerCount": 0,
+    "playlist": "ffa"
+  },
+  {
+    "description": "腐竹是[煌猫猫]shiwuhuanga；ban喷火,DMR,G2,双重;个人单纯感觉恶心,捏雷不管(说的就是你，老徐),在这里感谢LightBlueCube,差点没给他干出高血压",
+    "gameState": 4,
+    "hasPassword": false,
+    "id": "TjVxbNmXmtOeZcfp9IZvfDZwb3pDBHj",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_drydock",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "煌猫猫的有点村规的铁对铁",
+    "playerCount": 16,
+    "playlist": "ps"
+  },
+  {
+    "description": "“什么？我马怎么没了？”EA和重生遭到晴天霹雳一般愣在原地。这时一旁的黑客过来安慰到“没事，我也没有”并指了指旁边的gua哥说“这家伙连户口本都只剩一页了不也好好的”。",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "A8yLDs21aFbMEccwThubFBICBdsAw65",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_angel_city",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[LTLP]TTDM ONLY 泰坦争斗 QQ群390-127-666",
+    "playerCount": 0,
+    "playlist": "ttdm"
+  },
+  {
+    "description": "非常感谢Lightbluecube",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "2rGUqb7sTuZQ39p4XpinL0QErwbCJrV",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_wargames",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【ZDJ3】走地鸡训练营01",
+    "playerCount": 0,
+    "playlist": "aitdm"
+  },
+  {
+    "description": "有神盾升级的泰坦争斗！若您的浪人水平较高，还请自觉禁用，给队友和对手一个良好的游戏环境。",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "YwozidhwN5GAx096H8yxeO87AjfCdhC",
+    "lastHeartbeat": 1685759075,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 10,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[Boil] 神盾泰坦争斗，专为边境人准备！",
+    "playerCount": 0,
+    "playlist": "attdm"
+  },
+  {
+    "description": "复活10秒锁血保护,捏雷解除隐身,禁手柄辅瞄,挂机自动踢。本服只欢迎萌新,谢绝老玩家养老。本服由半夜咳嗽的狼搭设,崩服自动重启请耐心等待。如遇炸鱼请凭战绩截图或录像举报",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "dCzDI5v3ZtlpZ8kNpq2ve1UH1A0ZszA",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_drydock",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[萌新专用]KD高踢出KD低加血-半夜咳嗽狼萌新服",
+    "playerCount": 0,
+    "playlist": "ps"
+  },
+  {
+    "description": "服主：SamZong 泰坦掉了激情对抗 服务器由SamZong提供 加qq群693876098了解更多",
+    "gameState": 4,
+    "hasPassword": false,
+    "id": "vLwj4CMraHlvbQXv39CsbnOy7RPVLUH",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_relic02",
+    "maxPlayers": 20,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【星愿服G5.0】【经典三倍核心-类型处决-泰坦上新】",
+    "playerCount": 20,
+    "playlist": "ttdm"
+  },
+  {
+    "description": "复活10秒锁血保护,捏雷解除隐身,禁手柄辅瞄,挂机自动踢。本服由半夜咳嗽的狼搭设,崩服自动重启请耐心等待。",
+    "gameState": 9,
+    "hasPassword": false,
+    "id": "SILhg2ufsdNDQ3ROrOoqigCEUTnId8a",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_lobby",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[60Tick]半夜咳嗽的狼-纯净原版消耗战",
+    "playerCount": 0,
+    "playlist": "private_match"
+  },
+  {
+    "description": "群号316735228，欢迎加入，感谢Real_SamZong的技术支持",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "ru932USNJKr2djer76YVaAEflWbgOnD",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_glitch",
+    "maxPlayers": 20,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【ZDJ1】走地鸡拳赛，但是你甚至没枪",
+    "playerCount": 0,
+    "playlist": "ffa"
+  },
+  {
+    "description": "按 ~ 键启动控制台,该键位于 Esc 下方,Tab 上方,数字键 1 左侧,在服务器内打开控制台输入 docs 查看帮助文档,提问前先看文档,问文档内写过的东西不仅是在浪费别人时间,也是非常不礼貌的行为",
+    "gameState": 4,
+    "hasPassword": false,
+    "id": "iqFf1ofVZPvxmqd7GWMiyEspJtGCvod",
+    "lastHeartbeat": 1685759075,
+    "map": "mp_thaw",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "删了ai，稳定性提升10000% | !!!!务必读完简介!!!! #2 UMi/IFP",
+    "playerCount": 0,
+    "playlist": "aitdm"
+  },
+  {
+    "description": "原顶级烟花服，为了你和队友的游戏体验游玩前强烈建议先进群：647463232，谢谢 ",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "tZvSz0opM1jwVUS7N4P4uAa0u0jedFT",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_black_water_canal",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": true,
+          "Version": "1.10.0"
+        }
+      ]
+    },
+    "name": "[深弦星境]边境防御01-简单，第11期，看简介！",
+    "playerCount": 0,
+    "playlist": "fd_easy"
+  },
+  {
+    "description": "小艾芙frifjer的qq群:340562339,欢迎加群交流(小艾芙是手柄萌新,碰见请下手轻点qwq)",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "emiw1cc5TfZbmnfsTgeyWRBt1R2OdwF",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_lf_township",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "小艾芙frifjer的窝-纯净铁对铁",
+    "playerCount": 0,
+    "playlist": "ps"
+  },
+  {
+    "description": "既可通过达到分数上限获胜，也可通过击败对方BOSS获胜。IMC为毒蛇方，反抗军为拉斯提摩沙方。选用至尊泰坦使用瞎改的装备。服主：lx785。Q群:673482102(提建议,反馈bug,万年死寂群)",
+    "gameState": 4,
+    "hasPassword": false,
+    "id": "AmuRoRneSetw4UMS0I5LTGGLQp7ialo",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_glitch",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "[泰坦陨落极速掉线版]当毒蛇和拉斯提摩沙在多人模式打起来",
+    "playerCount": 12,
+    "playlist": "ttdm"
+  },
+  {
+    "description": "重生护盾已上线 只为那些最有经验和勇气的铁驭开放 提供高强度的PVP体验",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "RcUSvbEDopGpTNbxv8E42pBUDKucQ3j",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_angel_city",
+    "maxPlayers": 10,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.12.6"
+        }
+      ]
+    },
+    "name": "[高压竞技]|[队伍平衡]|[低战绩淘汰]rogo921`s竞技向泰坦争斗服务器r6",
+    "playerCount": 0,
+    "playlist": "ttdm"
+  },
+  {
+    "description": "规则大体与一服相同，今天也是鸭鸭被sheyu撅的一天，欢迎加新时代养老服交流q群：747829812",
+    "gameState": 4,
+    "hasPassword": false,
+    "id": "Gg1qHFevsDqg0wHP4WQJf4BHOPiAbsn",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_lf_meadow",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "新时代养老服G2,kd过高踢出",
+    "playerCount": 11,
+    "playlist": "ps"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "jr5RQE987p9lQzWIVSovh2BrqzPsDlm",
+    "lastHeartbeat": 1685759075,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方边境防御[简单]#3",
+    "playerCount": 4,
+    "playlist": "fd_easy"
+  },
+  {
+    "description": "泰坦重生自带重生保护，群号316735228",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "Q7gwWYXRIJyxqnEbdZyrQPqdZI9vNDb",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_homestead",
+    "maxPlayers": 10,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【ZDJ4】走地鸡原版纯净神盾泰坦争斗",
+    "playerCount": 0,
+    "playlist": "ttdm"
+  },
+  {
+    "description": "按 ~ 键启动控制台,该键位于 Esc 下方,Tab 上方,数字键 1 左侧,在服务器内打开控制台输入 docs 查看帮助文档,提问前先看文档,问文档内写过的东西不仅是在浪费别人时间,也是非常不礼貌的行为",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "EhMmrfwhj4T7xiid8ZvxDiY79C31dWl",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_homestead",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "删了ai，稳定性提升10000% | !!!!务必读完简介!!!! #1 UMi/IFP",
+    "playerCount": 0,
+    "playlist": "aitdm"
+  },
+  {
+    "description": "感谢D3-3109的帮助，边境文件来自国外大佬Zanieon，我适当降低难度（3倍核心服改））",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "UvtjOtssKVIcAYSPhHm4lfNK70Giw71",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_lobby",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[SL2]nihao的测试服、边境大师",
+    "playerCount": 0,
+    "playlist": "private_match"
+  },
+  {
+    "description": "QQ群456665285,感谢cmggy",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "UmbTCuVk3drIMjax2nBgtbIV8jiEG7T",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_coliseum_column",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【超好玩】危机四伏",
+    "playerCount": 0,
+    "playlist": "sns"
+  },
+  {
+    "description": "如题，群150381961",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "BiLKpytH85obR6B1SERzEf1PN1xldZk",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_eden",
+    "maxPlayers": 20,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "重生之我就是电弧泰坦G2.0 #5 UMi",
+    "playerCount": 0,
+    "playlist": "ps"
+  },
+  {
+    "description": "",
+    "gameState": 9,
+    "hasPassword": false,
+    "id": "QvLITs6oIVAI8C1FFARF4UCimqPjKS1",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_lobby",
+    "maxPlayers": 10,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "半夜开趴的坤哥",
+    "playerCount": 0,
+    "playlist": "private_match"
+  },
+  {
+    "description": "鬼拥有脉冲刀，人的脉冲刀替换为时停陷阱技能mod作者:VoyageDB",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "u62AbDNdFIVrJ7MQtkjhYSQ3QQKUpnN",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_rise",
+    "maxPlayers": 24,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "[CN]坏逼们的服务器 躲猫猫",
+    "playerCount": 0,
+    "playlist": "hs"
+  },
+  {
+    "description": "QQ群456665285，感谢cube",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "QcI6zuWpgN8FVUhvu5jA7m9avkaU6zj",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_angel_city",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【超好玩】9级帝王消耗战",
+    "playerCount": 12,
+    "playlist": "aitdm"
+  },
+  {
+    "description": "非常感谢Lightbluecube",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "rQ54gwriZzLh4yMoSvn96m0XBWQj5ZG",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_wargames",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【ZDJ2】走地鸡训练营02",
+    "playerCount": 0,
+    "playlist": "aitdm"
+  },
+  {
+    "description": "香芋球的AK服务器.装了武器平衡插件.预留2管理员通道.",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "rwvje2ziBTloRkb09jc2K9A9sm7mZja",
+    "lastHeartbeat": 1685759075,
+    "map": "mp_lf_traffic",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSSN]8V8 战术击杀 小图铁对铁-Sakuya#5",
+    "playerCount": 0,
+    "playlist": "ps"
+  },
+  {
+    "description": "服务器仍在测试中",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "dfhBuzxXgHLCnTOAftZt49nyNBHnU3N",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_coliseum_column",
+    "maxPlayers": 8,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[1.5.0新模式][AK云广东]4复活点竞技场针锋相对",
+    "playerCount": 0,
+    "playlist": "sns"
+  },
+  {
+    "description": "Produced By 铁驭寿司店",
+    "gameState": 0,
+    "hasPassword": true,
+    "id": "pbTt4ik6Ek01rYBzAWMbZkuTfaeGFh1",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_lobby",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【SSD7】XO16降速器",
+    "playerCount": 0,
+    "playlist": "private_match"
+  },
+  {
+    "description": "原版泰坦，未经修改，连续两条命不能使用同一泰坦。——感谢星落提供的技术支持——闲聊群:748377582",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "xPo4lmig0Zs9eK2vhcN1pnuRizS2V7r",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_black_water_canal",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "〔Canvines〕2服  泰坦混战无限制房",
+    "playerCount": 0,
+    "playlist": "tffa"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "r3WByCIRZw18DVVVUnnDhqGo1b5cj4U",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方边境防御[普通]#4",
+    "playerCount": 4,
+    "playlist": "fd_normal"
+  },
+  {
+    "description": "面向小白出租服务器，有需要者可加297-319-959联系群主",
+    "gameState": 9,
+    "hasPassword": true,
+    "id": "Numys8UaeNYSmdZ4Wt8HAhtT1tv660D",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_lobby",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【SSD2】出租\\托管\\专用自定义房间",
+    "playerCount": 0,
+    "playlist": "private_match"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "QT16C9sBNzIAmml1CXH4jWCPX7Ro75M",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_angel_city",
+    "maxPlayers": 10,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方泰坦争斗#1",
+    "playerCount": 0,
+    "playlist": "ttdm"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "PwdJaEI6yQyufGxHAWKyW3r4uukhLzD",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方边境防御[疯狂]#1",
+    "playerCount": 4,
+    "playlist": "fd_insane"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "DwxvGzoSipLUaomzSmL3VXXESFpGjnW",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方边境防御[普通]#1",
+    "playerCount": 4,
+    "playlist": "fd_normal"
+  },
+  {
+    "description": "开启动态难度平衡，为了你和队友的游戏体验游玩前强烈建议先进群：647463232，谢谢 ",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "1FtPfV6ATQ2Ydwb5W5Aszk36KVuUPAh",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_black_water_canal",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": true,
+          "Version": "1.10.0"
+        }
+      ]
+    },
+    "name": "[深弦星境]边境防御04-大师，第11期，看简介！",
+    "playerCount": 0,
+    "playlist": "fd_master"
+  },
+  {
+    "description": "浪人神盾砍掉两层，其余神盾泰坦不变，回合结束队伍平衡，重生保护，感谢超好玩提供的神盾模组",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "y30yAdNl2kTH8oiVNfAwb1SKPOmHACp",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_relic02",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "军团赛高的平衡性神盾战，浪人刑满释放",
+    "playerCount": 0,
+    "playlist": "ttdm"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "zAqgje9KgYkucgK2R7DYflyEIKiZ2ba",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方边境防御[普通]#3",
+    "playerCount": 0,
+    "playlist": "fd_normal"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "OEM0hSNhESOhYOLlZ6ISFx4gLE5OhtT",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_angel_city",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方原版铁对铁#1",
+    "playerCount": 0,
+    "playlist": "ps"
+  },
+  {
+    "description": "开启动态难度平衡，为了你和队友的游戏体验游玩前强烈建议先进群：647463232，谢谢 ",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "nLDTcsbNWXm3blUWQtRBG3pMAS0XO2e",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_black_water_canal",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": true,
+          "Version": "1.10.0"
+        }
+      ]
+    },
+    "name": "[深弦星境]边境防御03-困难，第11期，看简介！",
+    "playerCount": 0,
+    "playlist": "fd_hard"
+  },
+  {
+    "description": "服务器仍在测试中",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "lf9CjdcPXEf1bZJrbCLETSNlSupBZNI",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_coliseum_column",
+    "maxPlayers": 8,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[1.5.0新模式][AK云广东]4复活点竞技场针锋相对-2",
+    "playerCount": 0,
+    "playlist": "sns"
+  },
+  {
+    "description": "香芋球的AK服务器.装了武器平衡插件.预留2管理员通道.",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "bGMAiMkgNOTPLA87rgbUvH2cZ3SKlvJ",
+    "lastHeartbeat": 1685759075,
+    "map": "mp_lf_meadow",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSSN]8v8 战术强化 小图铁对铁-Sakuya#4",
+    "playerCount": 0,
+    "playlist": "ps"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "KFjxf7q0nzs8mjmRMJy4iXmI3sf8gtk",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 24,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方24人躲猫猫#1",
+    "playerCount": 0,
+    "playlist": "hs"
+  },
+  {
+    "description": "试运行。不是萌新服！枪械强度经过平衡，一些武器被替换为电冲，有意见或建议请在kook联系sheyu125，欢迎加q群747829812",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "k2U2rDWJPs9JxWKqID48TRHsLBq5TS9",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_thaw",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "新时代养老服，高kd踢出",
+    "playerCount": 0,
+    "playlist": "ps"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "EqtuLCah5GTfrKgirda9vUxALTSuLaL",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 10,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方泰坦殊死战#1",
+    "playerCount": 0,
+    "playlist": "lts"
+  },
+  {
+    "description": "QQ群456665285，感谢cube                                                                                                      chao",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "y3FfjyiVpqEZ69pdHhGwFSKDxKzXZOA",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_relic02",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【超好玩】9级帝王泰坦战",
+    "playerCount": 0,
+    "playlist": "ttdm"
+  },
+  {
+    "description": "反馈请联系618huiyi或sheyu，由于不可抗力因素，ban了隐身、捏雷、重力星，欢迎加q群747829812",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "JH2zUeLYQJjB8W0kZKXjrypWoYOJZ1A",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_angel_city",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "新时代男高服,不限kd铁对铁",
+    "playerCount": 0,
+    "playlist": "ps"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "Nmkn2eFxeW5J0ZVK7gBE9mcvSxjU08T",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_coliseum_column",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方争锋相对#1",
+    "playerCount": 0,
+    "playlist": "sns"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "qpLjTIyzRn1LDsX1t7O6sSwqxDC96dY",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 24,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方24人感染#1",
+    "playerCount": 0,
+    "playlist": "inf"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "PY2McbyfZnWE6c0bxk6dtk1p1t2ozNo",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方边境防御[大师]#2",
+    "playerCount": 0,
+    "playlist": "fd_master"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "xqopDZsuQoSrshI1Wv9DrNJW3b3hunH",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_drydock",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方原版消耗战#1",
+    "playerCount": 12,
+    "playlist": "aitdm"
+  },
+  {
+    "description": "kd限制比养老服严格，欢迎来到萌新impart服，感谢sheyu125的技术支持，有问题qq群689841182反馈",
+    "gameState": 4,
+    "hasPassword": false,
+    "id": "lzXBGJ1NXrrBGlbUZ4V7Ru1fDa6k0rg",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_lf_township",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "萌新impart服，高kd踢出低kd加血",
+    "playerCount": 10,
+    "playlist": "ps"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "C0oCZBDDWSRmwANZPu0JHLl7fhXQpAD",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方边境防御[简单]#1",
+    "playerCount": 1,
+    "playlist": "fd_easy"
+  },
+  {
+    "description": "服主：SamZong 泰坦掉了激情对抗 服务器由SamZong提供 加qq群693876098了解更多",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "U44RdhMTHqgntrycQ9M1cVIjiWr74Ch",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_thaw",
+    "maxPlayers": 20,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【星愿服G5.0】【原版三倍核心-类型处决-出生保護】",
+    "playerCount": 0,
+    "playlist": "ttdm"
+  },
+  {
+    "description": "",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "4yKujShSFwxyU0zbI6VyI2pnNfaNwom",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_drydock",
+    "maxPlayers": 8,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【SSD6】针锋相对纯脉冲刀",
+    "playerCount": 0,
+    "playlist": "sns"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "5PZ49rmhTGMXjoSWZOA9tLV7mjOKoPv",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方原版消耗战#2",
+    "playerCount": 0,
+    "playlist": "aitdm"
+  },
+  {
+    "description": "详细说明见铁驭寿司店Q群297-319-959群公告",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "8g4uLD8xGf4VnGFiXRUMBr3dmX5IJhD",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_drydock",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【SSD4】皇牌空战V0.5-看简介",
+    "playerCount": 0,
+    "playlist": "ttdm"
+  },
+  {
+    "description": "QQ群456665285,感谢cube",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "kcbncl9zSuC5uE7qygeOz1XSBy570lD",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_black_water_canal",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【超好玩】超级先锋泰坦",
+    "playerCount": 3,
+    "playlist": "fd_master"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "i0spnTWkezkm1dojloDJ7Fg7yndrFEr",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方天幕骇客#1",
+    "playerCount": 0,
+    "playlist": "fastball"
+  },
+  {
+    "description": "群号316735228，本服仅对群友开放",
+    "gameState": 1,
+    "hasPassword": true,
+    "id": "1I7JORXmqsDE518uPSBl1n9lF4EI1EE",
+    "lastHeartbeat": 1685759075,
+    "map": "mp_crashsite3",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【ZDJ5】走地鸡之家",
+    "playerCount": 0,
+    "playlist": "mfd"
+  },
+  {
+    "description": "开启动态难度平衡，为了你和队友的游戏体验游玩前强烈建议先进群：647463232，谢谢 ",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "85ofgi61Gg86UxJGtWvWwoK8l7rikiS",
+    "lastHeartbeat": 1685759075,
+    "map": "mp_black_water_canal",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": true,
+          "Version": "1.10.0"
+        }
+      ]
+    },
+    "name": "[深弦星境]边境防御06-困难，第11期，看简介！",
+    "playerCount": 0,
+    "playlist": "fd_hard"
+  },
+  {
+    "description": "纯正神盾泰坦战，群297-319-959",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "y93qPFCavLPlN76aYi1ZbDOLwfU6H9v",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【SSD3】纯正神盾泰坦战",
+    "playerCount": 0,
+    "playlist": "ttdm"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": true,
+    "id": "kfOp3KRtmm0TO0OVCq5313rwq00fLLM",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_lobby",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "IKUN击剑室",
+    "playerCount": 0,
+    "playlist": "private_match"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "Xuw6ENbl0fyRKwN5iShHHFUrq9EyQt8",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_colony02",
+    "maxPlayers": 24,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方18k空速铁对铁#1",
+    "playerCount": 4,
+    "playlist": "ps"
+  },
+  {
+    "description": "香芋球的AK服务器.装了武器平衡插件.预留2管理员通道.",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "bvKkRIEEx7gH5t5L8exJoEdtijrYCqR",
+    "lastHeartbeat": 1685759075,
+    "map": "mp_lf_traffic",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSSN]100tick 6V6 激战 小图铁对铁 -Sakuya#6",
+    "playerCount": 0,
+    "playlist": "ps"
+  },
+  {
+    "description": "QQ群456665285,感谢cmggy",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "4KADVlpOzUhUqrzuSDt9QxknxxC9wIw",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_black_water_canal",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【超好玩】技能狂",
+    "playerCount": 0,
+    "playlist": "ps"
+  },
+  {
+    "description": "铁驭寿司店-297-319-959",
+    "gameState": 4,
+    "hasPassword": false,
+    "id": "Ti6Seijc3va9HIJ0qv7ReF9mabbdgHV",
+    "lastHeartbeat": 1685759077,
+    "map": "mp_black_water_canal",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "【SSD1】公用自定义房间",
+    "playerCount": 6,
+    "playlist": "ps"
+  },
+  {
+    "description": "开启动态难度平衡，为了你和队友的游戏体验游玩前强烈建议先进群：647463232，谢谢 ",
+    "gameState": 0,
+    "hasPassword": true,
+    "id": "ZxitgjwBbaoAVHvwQzaAnKm1bwt3IrS",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_lobby",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": true,
+          "Version": "1.10.0"
+        }
+      ]
+    },
+    "name": "[深弦星境]边境防御07-大师，第11期，看简介！",
+    "playerCount": 0,
+    "playlist": "private_match"
+  },
+  {
+    "description": "原顶级烟花服，为了你和队友的游戏体验游玩前强烈建议先进群：647463232，谢谢 ",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "anuZg0O2Cqu17eTfJRY22npAJVOI4d9",
+    "lastHeartbeat": 1685759078,
+    "map": "mp_black_water_canal",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": true,
+          "Version": "1.10.0"
+        }
+      ]
+    },
+    "name": "[深弦星境]边境防御05-普通，第11期，看简介！",
+    "playerCount": 0,
+    "playlist": "fd_normal"
+  },
+  {
+    "description": "测试各种新笨比东西的地方",
+    "gameState": 4,
+    "hasPassword": false,
+    "id": "e34EcNtFQr3Ltu8puCrkMvX6FOS0X5h",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_glitch",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.5"
+        }
+      ]
+    },
+    "name": "TEST SERVER | 有白名单你进不去 #6 UMi",
+    "playerCount": 0,
+    "playlist": "aitdm"
+  },
+  {
+    "description": "血量归零后不会立即死亡而是会倒地。反泰坦武器可以用作铁驭战斗。按强化键以使用护盾电池，倒地后按下开火键以使用击倒护盾，在倒地玩家的背后按使用键以进行处决",
+    "gameState": 1,
+    "hasPassword": false,
+    "id": "5i6Bpxh7I9Pa2zpX2eA0SLO9ylhzSAt",
+    "lastHeartbeat": 1685759075,
+    "map": "mp_drydock",
+    "maxPlayers": 16,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.0"
+        }
+      ]
+    },
+    "name": "PVP+流血倒地",
+    "playerCount": 0,
+    "playlist": "ps"
+  },
+  {
+    "description": "",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "fXSQnDgcpxPKrlD7yZb6nc4I3vuris3",
+    "lastHeartbeat": 1685759076,
+    "map": "mp_forwardbase_kodai",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "[NSCN] 北极星CN官方边境防御[疯狂]#2",
+    "playerCount": 0,
+    "playlist": "fd_insane"
+  },
+  {
+    "description": "原顶级烟花服，为了你和队友的游戏体验游玩前强烈建议先进群：647463232，谢谢 ",
+    "gameState": 0,
+    "hasPassword": false,
+    "id": "Svj3VEta7I3MeZyOt7QE3obYDAnPeGR",
+    "lastHeartbeat": 1685759075,
+    "map": "mp_black_water_canal",
+    "maxPlayers": 4,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": true,
+          "Version": "1.10.0"
+        }
+      ]
+    },
+    "name": "[深弦星境]边境防御02-简单，第11期，看简介！",
+    "playerCount": 0,
+    "playlist": "fd_easy"
+  },
+  {
+    "description": "由于混战泰坦强度问题，对所有泰坦进行了平衡性调整。——感谢星落的技术支持 〔平衡尚未完善，欢迎大家提供建议意见，b站私信 绯雪vines 〕闲聊群:748377582",
+    "gameState": 4,
+    "hasPassword": false,
+    "id": "rX587OoDEjGAUIhRS5x56rsgz5xHAim",
+    "lastHeartbeat": 1685759079,
+    "map": "mp_wargames",
+    "maxPlayers": 12,
+    "modInfo": {
+      "Mods": [
+        {
+          "Name": "Northstar.Custom",
+          "Pdiff": "// this is just an empty pdiff file so that if people roll back an update the pdiff file will be overwritten\n",
+          "RequiredOnClient": false,
+          "Version": "1.13.4"
+        }
+      ]
+    },
+    "name": "〔Canvines〕1服  泰坦混战平衡房",
+    "playerCount": 0,
+    "playlist": "tffa"
+  }
+]

@@ -9,7 +9,6 @@ import top.kkoishi.json.io.FieldTypeParserFactory
 import top.kkoishi.json.reflect.Type
 import java.lang.reflect.Field
 import java.lang.reflect.Method
-import java.lang.reflect.Modifier
 
 abstract class AbstractFieldTypeParser<T : Any>(type: Type<T>) : FieldTypeParser<T>(type) {
 
