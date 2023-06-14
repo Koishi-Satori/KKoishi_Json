@@ -145,6 +145,11 @@ class Kson {
     val htmlEscape: Boolean
 
     /**
+     * If translate escape when reading.
+     */
+    val processEscape: Boolean
+
+    /**
      * These two fields is used to determine the method to parsing numbers and some OS-related details (e.g. the line
      * separator).
      */
@@ -202,6 +207,7 @@ class Kson {
         NumberMode.ALL_TYPE,
         DEFAULT_WRITER,
         DEFAULT_HTML_ESCAPE,
+        DEFAULT_PROCESS_ESCAPE,
         initFactories)
 
     private constructor(
@@ -214,6 +220,7 @@ class Kson {
         numberMode: NumberMode,
         writer: Writer?,
         htmlEscape: Boolean,
+        processEscape: Boolean,
         initFactories: List<Pair<JType, TypeParserFactory>>,
     ) {
         this.dateStyle = dateStyle
@@ -224,6 +231,7 @@ class Kson {
         this.platform = platform
         this.mode = numberMode
         this.htmlEscape = htmlEscape
+        this.processEscape = processEscape
         jsonWriter.set(writer)
 
         this.stored.set(HashMap())
@@ -263,6 +271,7 @@ class Kson {
         private const val DEFAULT_USE_UNSAFE = true
         private const val DEFAULT_IGNORE_NULL = false
         private const val DEFAULT_HTML_ESCAPE = false
+        private const val DEFAULT_PROCESS_ESCAPE = true
 
         @JvmStatic
         private val OBJECT_TWO_PARAMETERS: Array<JType> = arrayOf(Any::class.java, Any::class.java)
@@ -308,6 +317,7 @@ class Kson {
             numberMode: NumberMode,
             writer: Any?,
             htmlEscape: Boolean,
+            processEscape: Boolean,
             initFactories: List<Pair<JType, TypeParserFactory>>,
         ): Kson {
             return Kson(dateStyle,
@@ -319,6 +329,7 @@ class Kson {
                 numberMode,
                 writer as Writer?,
                 htmlEscape,
+                processEscape,
                 initFactories)
         }
 

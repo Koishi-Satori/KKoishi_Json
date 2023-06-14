@@ -7,6 +7,7 @@ import java.math.BigInteger
 class JsonParserFactory @JvmOverloads constructor(
     val platform: Platform = Platform.LINUX,
     val mode: NumberMode = NumberMode.ALL_TYPE,
+    val processEscape: Boolean = true,
 ) {
     internal companion object {
         @JvmStatic
@@ -39,7 +40,8 @@ class JsonParserFactory @JvmOverloads constructor(
         @JvmStatic
         private val INT_LONG_MIN = BigInteger("-8000000000000000", 16)
 
-        class AllTypeJsonParser(iterator: Iterator<Char>, platform: Platform) : JsonParser(iterator, platform) {
+        class AllTypeJsonParser(iterator: Iterator<Char>, platform: Platform, processEscape: Boolean) :
+            JsonParser(iterator, platform, processEscape) {
             override fun judgeNumber(num: String): JsonPrimitive {
                 if (num.last() == 'f') {
                     val digit = BigDecimal(num.substring(0, num.length - 1))
@@ -74,7 +76,8 @@ class JsonParserFactory @JvmOverloads constructor(
             }
         }
 
-        class UntilShortJsonParser(iterator: Iterator<Char>, platform: Platform) : JsonParser(iterator, platform) {
+        class UntilShortJsonParser(iterator: Iterator<Char>, platform: Platform, processEscape: Boolean) :
+            JsonParser(iterator, platform, processEscape) {
             override fun judgeNumber(num: String): JsonPrimitive {
                 if (num.last() == 'f') {
                     val digit = BigDecimal(num.substring(0, num.length - 1))
@@ -105,7 +108,8 @@ class JsonParserFactory @JvmOverloads constructor(
             }
         }
 
-        class UntilIntJsonParser(iterator: Iterator<Char>, platform: Platform) : JsonParser(iterator, platform) {
+        class UntilIntJsonParser(iterator: Iterator<Char>, platform: Platform, processEscape: Boolean) :
+            JsonParser(iterator, platform, processEscape) {
             override fun judgeNumber(num: String): JsonPrimitive {
                 if (num.last() == 'f') {
                     val digit = BigDecimal(num.substring(0, num.length - 1))
@@ -132,7 +136,8 @@ class JsonParserFactory @JvmOverloads constructor(
             }
         }
 
-        class UntilLongJsonParser(iterator: Iterator<Char>, platform: Platform) : JsonParser(iterator, platform) {
+        class UntilLongJsonParser(iterator: Iterator<Char>, platform: Platform, processEscape: Boolean) :
+            JsonParser(iterator, platform, processEscape) {
             override fun judgeNumber(num: String): JsonPrimitive {
                 if (num.last() == 'f') {
                     val digit = BigDecimal(num.substring(0, num.length - 1))
@@ -152,7 +157,8 @@ class JsonParserFactory @JvmOverloads constructor(
             }
         }
 
-        class BigNumberJsonParser(iterator: Iterator<Char>, platform: Platform) : JsonParser(iterator, platform) {
+        class BigNumberJsonParser(iterator: Iterator<Char>, platform: Platform, processEscape: Boolean) :
+            JsonParser(iterator, platform, processEscape) {
             override fun judgeNumber(num: String): JsonPrimitive {
                 if (num.last() == 'f')
                     return JsonBigDecimal(BigDecimal(num.substring(0, num.length - 1)))
@@ -160,7 +166,8 @@ class JsonParserFactory @JvmOverloads constructor(
             }
         }
 
-        class BigDecOnlyJsonParser(iterator: Iterator<Char>, platform: Platform) : JsonParser(iterator, platform) {
+        class BigDecOnlyJsonParser(iterator: Iterator<Char>, platform: Platform, processEscape: Boolean) :
+            JsonParser(iterator, platform, processEscape) {
             override fun judgeNumber(num: String): JsonPrimitive {
                 if (num.last() == 'f')
                     return JsonBigDecimal(BigDecimal(num.substring(0, num.length - 1)))
@@ -175,12 +182,12 @@ class JsonParserFactory @JvmOverloads constructor(
 
     fun create(iterator: Iterator<Char>): JsonParser {
         when (mode) {
-            NumberMode.ALL_TYPE -> return AllTypeJsonParser(iterator, platform)
-            NumberMode.BIG_NUMBER_ONLY -> return BigNumberJsonParser(iterator, platform)
-            NumberMode.UNTIL_INT -> return UntilIntJsonParser(iterator, platform)
-            NumberMode.UNTIL_SHORT -> return UntilShortJsonParser(iterator, platform)
-            NumberMode.UNTIL_LONG -> return UntilLongJsonParser(iterator, platform)
-            NumberMode.BIG_DECIMAL_ONLY -> return BigDecOnlyJsonParser(iterator, platform)
+            NumberMode.ALL_TYPE -> return AllTypeJsonParser(iterator, platform, processEscape)
+            NumberMode.BIG_NUMBER_ONLY -> return BigNumberJsonParser(iterator, platform, processEscape)
+            NumberMode.UNTIL_INT -> return UntilIntJsonParser(iterator, platform, processEscape)
+            NumberMode.UNTIL_SHORT -> return UntilShortJsonParser(iterator, platform, processEscape)
+            NumberMode.UNTIL_LONG -> return UntilLongJsonParser(iterator, platform, processEscape)
+            NumberMode.BIG_DECIMAL_ONLY -> return BigDecOnlyJsonParser(iterator, platform, processEscape)
             else -> throw IllegalArgumentException()
         }
     }

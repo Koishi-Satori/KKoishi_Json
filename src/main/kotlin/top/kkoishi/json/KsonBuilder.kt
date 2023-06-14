@@ -45,6 +45,7 @@ class KsonBuilder private constructor(
     private var platform: Platform,
     private var mode: NumberMode,
     private var htmlEscape: Boolean,
+    private var processEscape: Boolean,
     private var ignoredModifiers: Int = 0x0000,
 ) {
     private val stored: MutableList<Pair<Type, TypeParserFactory>> = KArrayDeque()
@@ -62,6 +63,7 @@ class KsonBuilder private constructor(
         kson.platform(),
         kson.mode(),
         kson.htmlEscape,
+        kson.processEscape,
         kson.ignoredModifiers().modifier()) {
         for ((key, factory) in (storedField[kson] as ThreadLocal<MutableMap<Type, TypeParserFactory>>).get()) {
             if (!Reflection.isType(factory.javaClass, InternalParserFactory.InitFactory::class.java))
@@ -76,7 +78,7 @@ class KsonBuilder private constructor(
         DEFAULT_IGNORE_NULL,
         Platform.LINUX,
         NumberMode.ALL_TYPE,
-        DEFAULT_HTML_ESCAPE)
+        DEFAULT_HTML_ESCAPE, DEFAULT_PROCESS_ESCAPE)
 
     fun modifyDateStyle(dateStyle: Int): KsonBuilder {
         synchronized(LOCK) {
@@ -153,6 +155,20 @@ class KsonBuilder private constructor(
         }
     }
 
+    fun unsbaleProcessEscape(): KsonBuilder {
+        synchronized(LOCK) {
+            this.processEscape = false
+            return this
+        }
+    }
+
+    fun processEscape(): KsonBuilder {
+        synchronized(LOCK) {
+            this.processEscape = true
+            return this
+        }
+    }
+
     fun register(type: Type, factory: TypeParserFactory): KsonBuilder {
         synchronized(LOCK) {
             stored.add(type to factory)
@@ -171,6 +187,7 @@ class KsonBuilder private constructor(
                 mode,
                 null,
                 htmlEscape,
+                processEscape,
                 stored.toList())
             if (prettyFormat)
                 Kson.setWriter(instance, Kson.getWriter(indent, componentSeparator, instance))
@@ -188,6 +205,7 @@ class KsonBuilder private constructor(
         private const val DEFAULT_USE_UNSAFE = true
         private const val DEFAULT_IGNORE_NULL = false
         private const val DEFAULT_HTML_ESCAPE = false
+        private const val DEFAULT_PROCESS_ESCAPE = true
 
         @JvmStatic
         private val storedField = Kson::class.java.getDeclaredField("stored")

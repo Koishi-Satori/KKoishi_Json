@@ -17,7 +17,7 @@ class NorthStarCNTest {
             val parser: ArrayTypeParser<Array<Server>> =
                 Factorys.getArrayTypeFactory().create(Type<Array<Server>>(Array<Server>::class.java))
             val ins: InputStream = FileInputStream("./NorthStarCN.json")
-            val reader = JsonReader(InputStreamReader(ins))
+            val reader = JsonReader(InputStreamReader(ins), true)
             val arr = reader.read()
             println(arr.isJsonArray())
             reader.close()

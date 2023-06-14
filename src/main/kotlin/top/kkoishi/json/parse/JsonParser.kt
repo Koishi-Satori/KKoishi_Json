@@ -3,9 +3,14 @@ package top.kkoishi.json.parse
 import top.kkoishi.json.*
 import top.kkoishi.json.exceptions.JsonInvalidFormatException
 import top.kkoishi.json.exceptions.JsonSyntaxException
+import top.kkoishi.json.internal.io.ParserManager.transEscapes
 import kotlin.jvm.Throws
 
-abstract class JsonParser internal constructor(iterator: Iterator<Char>, platform: Platform) {
+abstract class JsonParser @JvmOverloads internal constructor(
+    iterator: Iterator<Char>,
+    platform: Platform,
+    internal var processEscape: Boolean = true,
+) {
     internal val lexer: JsonLexer = JsonLexerFactory(platform).create(iterator)
     internal var cur: JsonElement? = null
 
@@ -37,8 +42,10 @@ abstract class JsonParser internal constructor(iterator: Iterator<Char>, platfor
     }
 
     private fun element(): JsonElement {
-        assert(lexer.hasNextToken()) { throw JsonSyntaxException("Unfinished json element.\n" +
-                "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}") }
+        assert(lexer.hasNextToken()) {
+            throw JsonSyntaxException("Unfinished json element.\n" +
+                    "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
+        }
         val token = lexer.nextToken()
         return when (token.type) {
             Type.QUOTE -> JsonString(parseString())
@@ -101,7 +108,7 @@ abstract class JsonParser internal constructor(iterator: Iterator<Char>, platfor
             throw JsonSyntaxException("The json string must end with '\"'.\n" +
                     "\tSyntax Error Location: ${lexer.line()}:${lexer.col() - 1}")
         }
-        return token.content
+        return if (processEscape) token.content.transEscapes() else token.content
     }
 
     private fun jsonObject(): JsonObject {

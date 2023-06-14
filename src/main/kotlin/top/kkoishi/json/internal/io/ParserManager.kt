@@ -56,4 +56,57 @@ internal object ParserManager {
 
     @JvmStatic
     private fun jsonPrimitiveParser(clz: Class<*>): TypeParser<Any> = UtilParsers.getPrimitiveParser(clz)
+
+    internal fun String.transEscapes(): String {
+        if (isEmpty())
+            return ""
+        val chars: CharArray = toCharArray()
+        val length = chars.size
+        var from = 0
+        var to = 0
+        while (from < length) {
+            var ch = chars[from++]
+            if (ch == '\\') {
+                ch = if (from < length) chars[from++] else '\u0000'
+                when (ch) {
+                    'b' -> ch = '\b'
+                    'f' -> ch = 12.toChar()
+                    'n' -> ch = '\n'
+                    'r' -> ch = '\r'
+                    's' -> ch = ' '
+                    't' -> ch = '\t'
+                    '\'', '\"', '\\' -> {
+                    }
+                    '0', '1', '2', '3', '4', '5', '6', '7' -> {
+                        val limit = Integer.min(from + if (ch <= '3') 2 else 1, length)
+                        var code = ch - '0'
+                        while (from < limit) {
+                            ch = chars[from]
+                            if (ch < '0' || '7' < ch) {
+                                break
+                            }
+                            from++
+                            code = code shl 3 or ch - '0'
+                        }
+                        ch = code.toChar()
+                    }
+                    '\n' -> continue
+                    '\r' -> {
+                        if (from < length && chars[from] == '\n') {
+                            from++
+                        }
+                        continue
+                    }
+                    else -> {
+                        val msg = String.format(
+                            "Invalid escape sequence: \\%c \\\\u%04X",
+                            ch, ch.toInt())
+                        throw IllegalArgumentException(msg)
+                    }
+                }
+            }
+            chars[to++] = ch
+        }
+        return String(chars, 0, to)
+    }
 }

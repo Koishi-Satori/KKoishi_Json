@@ -11,11 +11,19 @@ class JsonReader @JvmOverloads constructor(
     reader: Reader,
     platform: Platform = Platform.LINUX,
     mode: NumberMode = NumberMode.ALL_TYPE,
+    processEscape: Boolean = true,
 ) {
     var rest = reader.iterator()
-    val factory: JsonParserFactory = JsonParserFactory(platform, mode)
+    val factory: JsonParserFactory = JsonParserFactory(platform, mode, processEscape)
 
-    constructor(json: String, platform: Platform, mode: NumberMode): this(StringReader(json), platform, mode)
+    constructor(json: String, platform: Platform, mode: NumberMode) : this(StringReader(json), platform, mode)
+
+    constructor(reader: Reader, processEscape: Boolean) : this(reader,
+        Platform.LINUX,
+        NumberMode.ALL_TYPE,
+        processEscape)
+
+    constructor(json: String, processEscape: Boolean) : this(StringReader(json), processEscape)
 
     internal companion object {
         class ReaderWrapperIterator(val reader: Reader) : Iterator<Char> {
