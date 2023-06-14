@@ -3,7 +3,6 @@ import top.kkoishi.json.io.ArrayTypeParser
 import top.kkoishi.json.io.JsonReader
 import top.kkoishi.json.parse.Factorys
 import top.kkoishi.json.reflect.Type
-import top.kkoishi.json.reflect.TypeResolver
 import java.io.FileInputStream
 import java.io.InputStream
 import java.io.InputStreamReader

@@ -37,9 +37,10 @@ internal abstract class JsonLexer(protected var iterator: Iterator<Char>) {
         if (end)
             return Token.invalid
         while (true) {
-            if (!(lookup.isWhitespace() || lookup == '\n' || lookup == '\r')) {
+            if (!(lookup == '\n' || lookup == '\r')) {
                 if (!quoteFlag) {
-                    return tokenize0()
+                    if (!lookup.isWhitespace())
+                        return tokenize0()
                 } else {
                     if (lookup == '"') {
                         quoteFlag = false
