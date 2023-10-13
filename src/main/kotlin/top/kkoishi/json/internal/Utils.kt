@@ -7,7 +7,6 @@ import top.kkoishi.json.exceptions.UnsupportedException
 import top.kkoishi.json.internal.InternalParserFactory.DateParser
 import top.kkoishi.json.internal.InternalParserFactory.getFactory
 import top.kkoishi.json.internal.io.UtilParsers
-import top.kkoishi.json.internal.reflect.Reflection
 import top.kkoishi.json.io.TypeParser
 import top.kkoishi.json.io.TypeParserFactory
 import java.io.File

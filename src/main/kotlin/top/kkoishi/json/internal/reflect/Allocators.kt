@@ -53,23 +53,41 @@ internal object Allocators {
             val getConstructorId =
                 ObjectStreamClass::class.java.getDeclaredMethod("getConstructorId", Class::class.java)
             getConstructorId.isAccessible = true
-            val id = getConstructorId(null, Any::class.java) as Int
             val newInstance =
-                ObjectInputStream::class.java.getDeclaredMethod("newInstance", Class::class.java, Integer.TYPE)
+                ObjectStreamClass::class.java.getDeclaredMethod("newInstance", Integer.TYPE)
             newInstance.isAccessible = true
             return object : InstanceAllocator<Any> {
                 override fun allocateInstance(typeofT: Type<Any>): Any {
                     with(typeofT.rawType()) {
                         checkInstantiable(this)
-                        return newInstance(null, this, id)
+                        return newInstance(null, getConstructorId(null, this))
                     }
                 }
 
                 override fun allocateInstance(clz: Class<Any>): Any {
                     checkInstantiable(clz)
-                    return newInstance(null, clz, id)
+                    return newInstance(null, getConstructorId(null, clz))
                 }
 
+            }
+        } catch (e: Exception) {
+        }
+
+        try {
+            val newInstance = ObjectStreamClass::class.java.getDeclaredMethod("newInstance", Class::class.java)
+            newInstance.isAccessible = true
+            return object : InstanceAllocator<Any> {
+                override fun allocateInstance(clz: Class<Any>): Any {
+                    checkInstantiable(clz)
+                    return newInstance(null, clz)
+                }
+
+                override fun allocateInstance(typeofT: Type<Any>): Any {
+                    with(typeofT.rawType()) {
+                        checkInstantiable(this)
+                        return newInstance(null, this)
+                    }
+                }
             }
         } catch (e: Exception) {
         }
@@ -109,23 +127,41 @@ internal object Allocators {
             val getConstructorId =
                 ObjectStreamClass::class.java.getDeclaredMethod("getConstructorId", Class::class.java)
             getConstructorId.isAccessible = true
-            val id = getConstructorId(null, Any::class.java) as Int
             val newInstance =
-                ObjectInputStream::class.java.getDeclaredMethod("newInstance", Class::class.java, Integer.TYPE)
+                ObjectStreamClass::class.java.getDeclaredMethod("newInstance", Integer.TYPE)
             newInstance.isAccessible = true
             return object : InstanceAllocator<T> {
                 override fun allocateInstance(typeofT: Type<T>): T {
                     with(typeofT.rawType()) {
                         checkInstantiable(this)
-                        return newInstance(null, this, id) as T
+                        return newInstance(null, getConstructorId(null, this)) as T
                     }
                 }
 
                 override fun allocateInstance(clz: Class<T>): T {
                     checkInstantiable(clz)
-                    return newInstance(null, clz, id) as T
+                    return newInstance(null, getConstructorId(null, clz)) as T
                 }
 
+            }
+        } catch (e: Exception) {
+        }
+
+        try {
+            val newInstance = ObjectStreamClass::class.java.getDeclaredMethod("newInstance", Class::class.java)
+            newInstance.isAccessible = true
+            return object : InstanceAllocator<T> {
+                override fun allocateInstance(clz: Class<T>): T {
+                    checkInstantiable(clz)
+                    return newInstance(null, clz) as T
+                }
+
+                override fun allocateInstance(typeofT: Type<T>): T {
+                    with(typeofT.rawType()) {
+                        checkInstantiable(this)
+                        return newInstance(null, this) as T
+                    }
+                }
             }
         } catch (e: Exception) {
         }

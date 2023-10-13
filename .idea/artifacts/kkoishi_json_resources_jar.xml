@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="kkoishi.json-resources:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/kkoishi_json_resources_jar</output-path>
+    <root id="archive" name="kkoishi.json-resources_jar.jar">
+      <element id="module-source" name="kkoishi.json" />
+    </root>
+  </artifact>
+</component>
